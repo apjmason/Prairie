@@ -22,7 +22,7 @@ public class TwineImporterUI : EditorWindow {
 		TextAsset selectedFile = null;
 		if (Selection.activeObject != null) {
 			var filePath = AssetDatabase.GetAssetPath (Selection.activeObject);
-			if (Path.GetExtension (filePath) == "html") {
+			if (Path.GetExtension (filePath).Contains ("json")) {
 				selectedFile = (TextAsset) Selection.activeObject;
 			}
 		}
@@ -47,7 +47,7 @@ public class TwineImporterUI : EditorWindow {
 			prompt = targetFile.name;
 		}
 		if (GUILayout.Button (prompt)) {
-			var fullPath = EditorUtility.OpenFilePanel ("Select File", "Assets/", "html");
+			var fullPath = EditorUtility.OpenFilePanel ("Select File", "Assets", "json");
 
 			// obnoxiously, the OpenFilePanel returns a full file path,
 			// and Unity will only play nice with a relative one so we must convert
@@ -55,7 +55,7 @@ public class TwineImporterUI : EditorWindow {
 			var relativePath = GetRelativePath (fullPath, projectDirectory);
 
 			// double check we'll have access to this file
-			if (relativePath.StartsWith ("Assets/")) {
+			if (relativePath.StartsWith ("Assets/") || relativePath.StartsWith ("Assets\\")) {	// checks both Mac Path and PC Path types
 				this.targetFile = AssetDatabase.LoadAssetAtPath<TextAsset> (relativePath);
 			} else {
 				EditorUtility.DisplayDialog ("Can't Load Asset", "The file must be stored as part of your Unity project's assets.", "OK");
@@ -96,22 +96,7 @@ public class TwineImporterUI : EditorWindow {
 	/// </summary>
 	/// <param name="filePath">The file path of the Twine html to be imported</param>
 	void SendToImporter (TextAsset file) {
-
-		// =======    Link to Importer     ==========
-		// 	TwineImporter.Import (file);
-		// ==========================================
-
-		Debug.Log ("Importing "+file.name+"...");
-
-		// TODO: Read in the JSON string from a .json file loaded into the importer!
-		// Hardcoded for now:
-		var jsonString = "[{\"pid\":1,\"position\":{\"x\":505,\"y\":261},\"name\":\"Bedroom\",\"tags\":[\"warm\"],\"content\":\"You wake up in your bedroom.  [[Go to the kitchen]]  [[Go to the bathroom]] \",\"childrenNames\":[\"[[Go to the kitchen]]\",\"[[Go to the bathroom]]\"]},{\"pid\":2,\"position\":{\"x\":400,\"y\":450},\"name\":\"Go to the kitchen\",\"tags\":[\"yummy\"],\"content\":\"You make breakfast. It's very warm and nice.  [[Go to the bathroom]] [[Go to bed]] \",\"childrenNames\":[\"[[Go to the bathroom]]\",\"[[Go to bed]]\"]},{\"pid\":3,\"position\":{\"x\":700,\"y\":450},\"name\":\"Go to the bathroom\",\"tags\":[\"minty\"],\"content\":\"You brush your teeth. You have your favorite flavor of toothpaste.  [[Go to the CMC]] \",\"childrenNames\":[\"[[Go to the CMC]]\"]},{\"pid\":4,\"position\":{\"x\":400,\"y\":600},\"name\":\"Go to bed\",\"tags\":[\"wat\"],\"content\":\"Whelp, it's been a good morning. Time to go back to sleep I guess.\",\"childrenNames\":[]},{\"pid\":5,\"position\":{\"x\":700,\"y\":600},\"name\":\"Go to the CMC\",\"tags\":[\"fun\"],\"content\":\"COMPS MEETING TIME!!\",\"childrenNames\":[]}]\n";
-
-		// TODO: (related to above todo) Change `jsonString` parameter to `file`:
-		TwineJsonParser.ReadJson (jsonString);
-
-		Debug.Log ("Done!");
-	
+		TwineJsonParser.ImportFile (file);
 	}
 
 }
