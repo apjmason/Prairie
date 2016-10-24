@@ -54,6 +54,10 @@ public class TwineImporterUI : EditorWindow {
 			var projectDirectory = Directory.GetParent (Application.dataPath).ToString ();
 			var relativePath = GetRelativePath (fullPath, projectDirectory);
 
+			Debug.Log (fullPath);
+			Debug.Log (projectDirectory);
+			Debug.Log (relativePath);
+
 			// double check we'll have access to this file
 			if (relativePath.StartsWith ("Assets/") || relativePath.StartsWith ("Assets\\")) {	// checks both Mac Path and PC Path types
 				this.targetFile = AssetDatabase.LoadAssetAtPath<TextAsset> (relativePath);
