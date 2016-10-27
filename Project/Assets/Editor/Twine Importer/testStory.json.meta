@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Project/Assets/Editor/Twine Importer/Test Story (3).html.meta
+guid: d4b6a1d3df615d64787345fa7e620796
+timeCreated: 1476735047
+=======
 guid: 4c9ec06c2b1b7428daaa7c8f746a2f7d
 timeCreated: 1476752384
+>>>>>>> 1029bcbd2df5f2f32d9d92ef269531e338f1f2b6:Project/Assets/Editor/Twine Importer/testStory.json.meta
 licenseType: Free
 TextScriptImporter:
   userData: 
