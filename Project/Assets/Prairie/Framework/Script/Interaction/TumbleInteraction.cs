@@ -35,8 +35,7 @@ public class TumbleInteraction : Interaction
 			}
 			else if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Escape))
 			{
-				if (trigger.GetComponent<FirstPersonInteractor> () != null)
-					trigger.GetComponent<FirstPersonInteractor> ().SetIsFrozen (false);
+				this.SetPlayerIsFrozen(false);
 				pickedUp = false;
 			}
 		}
@@ -44,7 +43,6 @@ public class TumbleInteraction : Interaction
 
 	protected override void PerformAction() {
 		pickedUp = true;
-		if (trigger.GetComponent<FirstPersonInteractor> () != null)
-			trigger.GetComponent<FirstPersonInteractor> ().SetIsFrozen (true);
+		this.SetPlayerIsFrozen(true);
 	}
 }

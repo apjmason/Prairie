@@ -9,6 +9,7 @@ public class TwineNode : MonoBehaviour {
 	public string content;
 	public string[] childrenNames;
 	public GameObject[] children;
+	
 	public GameObject[] triggeredObjects;
 
 	// use the unity 'enabled' thing to keep track of whether
