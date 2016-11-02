@@ -6,7 +6,9 @@ public class TumbleInteraction : Interaction
 	/// <summary>
 	/// Allows user to rotate object.
 	/// </summary>
-	public bool pickedUp = false;
+	private bool pickedUp = false;
+	private int velocity = 10;
+
 
 	// When the user interacts with object, they invoke the ability to 
 	// tumble the object with the I, J, K and L keys. Interacting
@@ -19,19 +21,19 @@ public class TumbleInteraction : Interaction
 
 			if (Input.GetKey (KeyCode.L)) // right
 			{
-				transform.RotateRelativeToCamera (-10, 0);
+				transform.RotateRelativeToCamera (-velocity, 0);
 			}
 			else if (Input.GetKey (KeyCode.J)) // left
 			{
-				transform.RotateRelativeToCamera (10, 0);
+				transform.RotateRelativeToCamera (velocity, 0);
 			}
 			else if (Input.GetKey (KeyCode.K)) // down
 			{
-				transform.RotateRelativeToCamera (0, 10);
+				transform.RotateRelativeToCamera (0, velocity);
 			}
 			else if (Input.GetKey (KeyCode.I)) // up
 			{
-				transform.RotateRelativeToCamera (0, -10);
+				transform.RotateRelativeToCamera (0, -velocity);
 			}
 			else if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Escape))
 			{
