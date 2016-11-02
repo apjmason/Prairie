@@ -23,7 +23,7 @@ public class FirstPersonInteractor : MonoBehaviour
 	{
 		this.avaliableInteractions = GetAvaliableInteractions ();
 
-		if (Input.GetKeyDown(KeyCode.F))
+		if (Input.GetKeyDown (KeyCode.F))
 		{
 			this.AttemptInteract();
 		}
@@ -31,11 +31,11 @@ public class FirstPersonInteractor : MonoBehaviour
 
 	void OnGUI()
 	{
-		if (interactionAvaliable)
+		if (this.interactionAvaliable)
 		{
 			// Draw a GUI with the interaction
-			var frame = new Rect (Screen.width / 2, Screen.height / 2, Screen.width / 4, Screen.height / 4);
-			var firstInteractionPrompt = avaliableInteractions [0].prompt;
+			Rect frame = new Rect (Screen.width / 2, Screen.height / 2, Screen.width / 4, Screen.height / 4);
+			string firstInteractionPrompt = avaliableInteractions [0].prompt;
             GUI.BeginGroup(frame);
 			GUILayout.Box ("Press F to " + firstInteractionPrompt);
             GUI.EndGroup();
@@ -43,7 +43,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		else 
 		{
 			// hacky way to draw a crosshair 
-			var frame = new Rect (Screen.width / 2, Screen.height / 2, 10, 10);
+			Rect frame = new Rect (Screen.width / 2, Screen.height / 2, 10, 10);
 			GUI.Box (frame, "");
 		}
 
@@ -53,8 +53,9 @@ public class FirstPersonInteractor : MonoBehaviour
 	{
 		if (interactionAvaliable)
 		{
-			foreach (Interaction target in avaliableInteractions) {
-				target.Interact (gameObject);
+			foreach (Interaction target in avaliableInteractions)
+			{
+				target.Interact (this.gameObject);
 			}
 		}
 	}
@@ -72,15 +73,18 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		if (Physics.Raycast (origin, fwd, out hit, interactionRange))
 		{
-			if (hit.collider.isTrigger) {
+			if (hit.collider.isTrigger)
+			{
 				// ignore non-physical colliders, such as trigger areas
 				return new List<Interaction> ();
 			}
 
 			GameObject obj = hit.transform.gameObject;
-			var enabledInteractions = new List<Interaction> ();
-			foreach (Interaction i in obj.GetComponents<Interaction> ()) {
-				if (i.enabled) {
+			List<Interaction> enabledInteractions = new List<Interaction> ();
+			foreach (Interaction i in obj.GetComponents<Interaction> ())
+			{
+				if (i.enabled)
+				{
 					enabledInteractions.Add (i);
 				}
 			}
