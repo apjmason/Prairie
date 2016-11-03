@@ -1,29 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SwivelInteraction : Interaction {
+public class SwivelInteraction : Interaction
+{
 
 	public GameObject hinge;
-	private bool open = false;
-	private int direction = 1;
-	private float rotateTime;
-	
-	// Update is called once per frame
-	protected void Update()
+	private float rotateSpeed = 90.0f;
+	private float targetAngle = 0;
+	const float rotationAmount = 1.5f;
+
+	protected override void PerformAction()
 	{
-		if (open)
+		targetAngle -= rotateSpeed;
+	}
+
+	void Update()
+	{
+		// Trigger functions if Rotate is requested
+		if (Input.GetKeyDown (KeyCode.G))
 		{
-			transform.RotateAround(hinge.transform.position, new Vector3 (0,direction,0), 200*Time.deltaTime);
-			rotateTime += 1;
-			if (rotateTime == 22) {
-				rotateTime = 0;
-				direction = -direction;
-				open = false;
-			}
+			targetAngle += rotateSpeed;
+		}
+		if (targetAngle != 0)
+		{
+			Rotate();
 		}
 	}
 
-	protected override void PerformAction() {
-		open = true;
+	protected void Rotate()
+	{
+		if (targetAngle > 0)
+		{
+			transform.RotateAround (hinge.transform.position, Vector3.up, -rotationAmount);
+			targetAngle -= rotationAmount;
+		}
+		else if (targetAngle < 0)
+		{
+			transform.RotateAround (hinge.transform.position, Vector3.up, rotationAmount);
+			targetAngle += rotationAmount;
+		}
 	}
 }
