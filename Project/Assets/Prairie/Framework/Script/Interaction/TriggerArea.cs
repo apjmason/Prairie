@@ -2,15 +2,18 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Collider))]
-public class TriggerArea : MonoBehaviour {
+public class TriggerArea : MonoBehaviour
+{
 
     public GameObject[] additionalTargets;
 
-	void OnTriggerEnter(Collider other) {
+	void OnTriggerEnter(Collider other)
+	{
 
 		// ensure we're being triggered by a player
-		var playerInteractor = other.gameObject.GetComponent<FirstPersonInteractor> ();
-		if (playerInteractor == null) {
+		FirstPersonInteractor playerInteractor = other.gameObject.GetComponent<FirstPersonInteractor> ();
+		if (playerInteractor == null)
+		{
 			return;
 		}
 
@@ -18,7 +21,8 @@ public class TriggerArea : MonoBehaviour {
 		this.gameObject.InteractAll (playerInteractor.gameObject);
 
 		// Trigger all the Interactions on our additional targets
-		foreach (GameObject target in additionalTargets) {
+		foreach (GameObject target in additionalTargets)
+		{
 			target.InteractAll (playerInteractor.gameObject);
 		}
 	}

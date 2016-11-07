@@ -7,8 +7,8 @@ using System;
 /// <summary>
 /// Defines the Import Twine window and a few contextual menu actions to trigger import.
 /// </summary>
-public class TwineImporterUI : EditorWindow {
-
+public class TwineImporterUI : EditorWindow
+{
 	public TextAsset targetFile;
 
 	/// <summary>
@@ -16,13 +16,16 @@ public class TwineImporterUI : EditorWindow {
 	/// If triggered from a context menu on an HTML asset, the asset is automatically selected for import.
 	/// </summary>
 	[MenuItem("Assets/Import Twine Data...")]
-	static void ShowTwineImportWindow () {
+	static void ShowTwineImportWindow ()
+	{
 
 		// if triggered while a text asset is selected, populate it as the target file
 		TextAsset selectedFile = null;
-		if (Selection.activeObject != null) {
+		if (Selection.activeObject != null)
+		{
 			var filePath = AssetDatabase.GetAssetPath (Selection.activeObject);
-			if (Path.GetExtension (filePath).Contains ("json")) {
+			if (Path.GetExtension (filePath).Contains ("json"))
+			{
 				selectedFile = (TextAsset) Selection.activeObject;
 			}
 		}
@@ -35,33 +38,34 @@ public class TwineImporterUI : EditorWindow {
 	/// <summary>
 	/// Draws the GUI of the import window
 	/// </summary>
-	void OnGUI () {
+	void OnGUI ()
+	{
 		GUILayout.Label ("Import Twine Data", EditorStyles.boldLabel);
 
 		GUILayout.BeginHorizontal ();
 		GUILayout.Label ("Twine File:");
 
 		// button which selects a target file
-		var prompt = "Select File...";
+		string prompt = "Select File...";
 		if (targetFile != null) {
 			prompt = targetFile.name;
 		}
-		if (GUILayout.Button (prompt)) {
-			var fullPath = EditorUtility.OpenFilePanel ("Select File", "Assets", "json");
+		if (GUILayout.Button (prompt))
+		{
+			string fullPath = EditorUtility.OpenFilePanel ("Select File", "Assets", "json");
 
 			// obnoxiously, the OpenFilePanel returns a full file path,
 			// and Unity will only play nice with a relative one so we must convert
-			var projectDirectory = Directory.GetParent (Application.dataPath).ToString ();
-			var relativePath = GetRelativePath (fullPath, projectDirectory);
-
-			Debug.Log (fullPath);
-			Debug.Log (projectDirectory);
-			Debug.Log (relativePath);
+			string projectDirectory = Directory.GetParent (Application.dataPath).ToString ();
+			string relativePath = GetRelativePath (fullPath, projectDirectory);
 
 			// double check we'll have access to this file
-			if (relativePath.StartsWith ("Assets/") || relativePath.StartsWith ("Assets\\")) {	// checks both Mac Path and PC Path types
+			if (relativePath.StartsWith ("Assets/") || relativePath.StartsWith ("Assets\\"))
+			{
 				this.targetFile = AssetDatabase.LoadAssetAtPath<TextAsset> (relativePath);
-			} else {
+			}
+			else
+			{
 				EditorUtility.DisplayDialog ("Can't Load Asset", "The file must be stored as part of your Unity project's assets.", "OK");
 			}
 		}
@@ -72,7 +76,8 @@ public class TwineImporterUI : EditorWindow {
 
 		// button to send to importer
 		GUI.enabled = (this.targetFile != null);
-		if (GUILayout.Button ("Import")) {
+		if (GUILayout.Button ("Import"))
+		{
 			SendToImporter (this.targetFile);
 			this.Close ();
 		}
@@ -84,7 +89,8 @@ public class TwineImporterUI : EditorWindow {
 	/// <returns>A relative path with the `folder` as the base</returns>
 	/// <param name="filespec">The full path to a file inside of `folder`</param>
 	/// <param name="folder">The folder to act as the root for the new path</param>
-	private string GetRelativePath(string filespec, string folder) {
+	private string GetRelativePath(string filespec, string folder)
+	{
 		Uri pathUri = new Uri(filespec);
 		// Folders must end in a slash
 		if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))

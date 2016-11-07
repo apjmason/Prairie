@@ -67,7 +67,7 @@ public class TwineJsonParser {
 	}
 		
 	/// <summary>
-	/// Takes the twine/JSON node, and turns it into a game object with all the relevant data
+	/// Takes the twine/JSON node, and turns it into a game object with all the relevant data.
 	/// </summary>
 	/// <returns>GameObject of single node</returns>
 	/// <param name="parent">Parent.</param>
@@ -92,8 +92,8 @@ public class TwineJsonParser {
 	/// <summary>
 	/// Takes a string list of strings from the JSON, and makes it an array of
 	/// strings, where each string is distinct from the other instead of one
-	/// giant string
-	/// Boolean allows children to have more sliced off of each string than tags
+	/// giant string.
+	/// Boolean allows children to have more sliced off of each string than tags.
 	/// The 4 within the if statement is to slice off the brackets around the children: [[children]]
 	/// The 2 comes because we want to slice the brackets off of the tag: [tag]
 	/// </summary>

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayAudioInteraction : Interaction
+public class AudioInteraction : Interaction
 {
     public AudioClip audioClip;
     //we have a publi audio source so that the user can import their own

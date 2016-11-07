@@ -7,11 +7,15 @@ public abstract class Interaction : MonoBehaviour
 	public bool repeatable = true;
 
 	[HideInInspector]
-    public GameObject trigger;
+    public GameObject rootInteractor;
 
-	public void Interact (GameObject obj)
+	/// <summary>
+	/// Trigger behavoir of this interaction.
+	/// </summary>
+	/// <param name="interactor">The game object which is the root invoker of this action. Typically a player character.</param>
+	public void Interact (GameObject interactor)
 	{
-        trigger = obj;
+        this.rootInteractor = interactor;
 		if (this.enabled) {
 			PerformAction ();					// run the interaction
 			if (!repeatable) {
