@@ -7,6 +7,11 @@ public class DebugInteraction : PromptInteraction
 	protected override void PerformAction () 
 	{
 		Debug.Log ("Interacted with " + this.gameObject.name);
+		if (this.gameObject.name == ":GUN:")
+		{
+			FirstPersonInteractor player = this.GetPlayer();
+			player.SetGunMode(true);
+		}
 	}
 
 	override public string defaultPrompt {
