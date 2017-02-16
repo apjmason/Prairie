@@ -43,7 +43,7 @@ public static class TransformExtensions {
 		// Code adapted from:
 		// http://answers.unity3d.com/questions/299126/how-to-rotate-relative-to-camera-angleposition.html
 		
-		float sensitivity = .25f;
+		float sensitivity = .5f;
 		//Get Main camera in Use.
 		Camera cam = Camera.main;
 		//Gets the world vector space for cameras up vector 
