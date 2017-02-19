@@ -1,7 +1,0 @@
-[
-  {"pid":1,"position":{"x":505,"y":261},"name":"Bedroom","tags":["warm"],"content":"You wake up in your bedroom.  [[Go to the kitchen]]  [[Go to the bathroom]] ","childrenNames":["[[Go to the kitchen]]","[[Go to the bathroom]]"]},
-  {"pid":2,"position":{"x":400,"y":450},"name":"Go to the kitchen","tags":["yummy"],"content":"You make breakfast. It's very warm and nice.  [[Go to the bathroom]] [[Go to bed]] ","childrenNames":["[[Go to the bathroom]]","[[Go to bed]]"]},
-  {"pid":3,"position":{"x":700,"y":450},"name":"Go to the bathroom","tags":["minty"],"content":"You brush your teeth. You have your favorite flavor of toothpaste.  [[Go to the CMC]] ","childrenNames":["[[Go to the CMC]]"]},
-  {"pid":4,"position":{"x":400,"y":600},"name":"Go to bed","tags":["wat"],"content":"Whelp, it's been a good morning. Time to go back to sleep I guess.","childrenNames":[]},
-  {"pid":5,"position":{"x":700,"y":600},"name":"Go to the CMC","tags":["fun"],"content":"COMPS MEETING TIME!!","childrenNames":[]}
-]

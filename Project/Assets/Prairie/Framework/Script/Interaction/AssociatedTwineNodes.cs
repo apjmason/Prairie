@@ -40,7 +40,10 @@ public class AssociatedTwineNodes : PromptInteraction
 
 			if (twineNode != null) {
 				// Activate the node!
-				twineNode.Activate (this.rootInteractor);
+				if (twineNode.Activate (this.rootInteractor))
+				{
+					return;
+				}
 			}
 		}
 	}

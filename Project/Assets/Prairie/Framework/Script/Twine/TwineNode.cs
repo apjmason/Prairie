@@ -29,13 +29,13 @@ public class TwineNode : MonoBehaviour {
 	void Update ()
 	{
 		if (this.enabled) {
-			if (Input.GetKeyDown (KeyCode.Tab)) {
+			if (Input.GetKeyDown (KeyCode.Q)) {
 				this.isMinimized = !this.isMinimized;
 			}
 
 			if (this.isDecisionNode) {
-				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Q)) {
-					// Press Q to scroll through the children nodes
+				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
+					// Press TAB to scroll through the children nodes
 					this.selectedOptionIndex = (this.selectedOptionIndex + 1) % (children.Length);
 				} else if (this.isOptionsGuiOpen && (Input.GetKeyDown (KeyCode.KeypadEnter) || Input.GetKeyDown (KeyCode.Return))) {
 					// Press ENTER or RETURN to select that child
@@ -45,8 +45,8 @@ public class TwineNode : MonoBehaviour {
 					this.isOptionsGuiOpen = false;
 				}
 
-				// Q opens the options list if it's not already open
-				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Q)) {
+				// TAB opens the options list if it's not already open
+				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
 					this.isOptionsGuiOpen = true;
 				}
 			}
@@ -72,9 +72,9 @@ public class TwineNode : MonoBehaviour {
 				decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
 
 				if (!isOptionsGuiOpen) {
-					GUILayout.Box ("Press Q to progress in the story...", decisionHintStyle);
+					GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
 				} else {
-					GUILayout.Box ("Press Q to scroll, E to close, ENTER to choose", decisionHintStyle);
+					GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
 				}
 			}
 
@@ -125,7 +125,7 @@ public class TwineNode : MonoBehaviour {
 	/// 	active/enabled and it has some active parent)
 	/// </summary>
 	/// <param name="interactor">The interactor.</param>
-	public void Activate(GameObject interactor)
+	public bool Activate(GameObject interactor)
 	{
 		if (!this.enabled && this.HasActiveParentNode()) 
 		{
@@ -134,7 +134,11 @@ public class TwineNode : MonoBehaviour {
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
 			this.StartInteractions (interactor);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/// <summary>

@@ -23,7 +23,7 @@ public abstract class PromptInteraction : Interaction
     public void Reset()
     {
         Prompt prompt = this.gameObject.GetComponent<Prompt>();
-        if (prompt.promptText == null || prompt.promptText == "")
+        if (prompt.firstPrompt == null || prompt.firstPrompt == "")
         {
             prompt.SetDefaultPrompt();
         }

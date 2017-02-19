@@ -68,7 +68,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		{
 			// draw prompt on highlighted object
 			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
-			if (prompt != null && prompt.promptText.Trim() != "")
+			if (prompt != null && prompt.GetPrompt().Trim() != "")
 			{
 				prompt.DrawPrompt();
 			} else {
@@ -175,7 +175,13 @@ public class FirstPersonInteractor : MonoBehaviour
 				i.Interact (this.gameObject);		
 			} 
 		}
-	}
+
+        if (this.highlightedObject.GetComponent<Prompt>() != null)
+        {
+            this.highlightedObject.GetComponent<Prompt>().CyclePrompt();
+        }
+    }
+
 
 	private void AttemptReadAnnotation ()
 	{

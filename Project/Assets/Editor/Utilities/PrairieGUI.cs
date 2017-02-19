@@ -14,9 +14,19 @@ public class PrairieGUI {
 	private static GUILayoutOption minusButtonWidth = GUILayout.Width(20f);
 	private static GUILayoutOption plusButtonWidth = GUILayout.Width(60f);
 
+	// label suitable for an error or warning about a misconfiguration
 	public static void warningLabel(string text) {
 		GUIStyle warningLabel = new GUIStyle(GUI.skin.label);
         warningLabel.normal.textColor = Color.red;
+        warningLabel.wordWrap = true;
+
+        GUILayout.Label(text, warningLabel);
+	}
+
+	// label suitable for a hint, a reminder of functionality
+	public static void hintLabel(string text) {
+		GUIStyle warningLabel = new GUIStyle(GUI.skin.label);
+        warningLabel.normal.textColor = Color.gray;
         warningLabel.wordWrap = true;
 
         GUILayout.Label(text, warningLabel);
