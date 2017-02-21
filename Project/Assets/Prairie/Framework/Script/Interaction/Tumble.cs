@@ -22,7 +22,7 @@ public class Tumble : PromptInteraction
 		pickedUp = false;
 		oldRotation = Quaternion.identity;
 		oldPosition = this.transform.position;
-		distance = 1;
+		distance = 2;
 	}
 
 	protected void Update()
