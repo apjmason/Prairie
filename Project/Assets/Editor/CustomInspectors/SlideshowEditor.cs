@@ -6,11 +6,18 @@ using UnityEditor;
 public class SlideshowEditor : Editor {
 
 	Slideshow slideshow;
+    Texture2D[] editorSlides = new Texture2D[0];
 
 	public override void OnInspectorGUI()
 	{
 		slideshow = (Slideshow)target;
-		slideshow.Slides = PrairieGUI.drawObjectList ("Slides", slideshow.Slides);
+
+        if (editorSlides.Length == 0)
+        {
+            editorSlides = slideshow.Slides;
+        }
+
+		editorSlides = PrairieGUI.drawObjectList ("Slides", editorSlides);
 
 		for (int i = 0; i < slideshow.Slides.Length; i++) 
 		{
@@ -20,6 +27,8 @@ public class SlideshowEditor : Editor {
 				break;
 			}
 		}
+
+        slideshow.Slides = PrairieGUI.RemoveNulls(editorSlides);
 
 		if (GUI.changed) {
 			EditorUtility.SetDirty(slideshow);

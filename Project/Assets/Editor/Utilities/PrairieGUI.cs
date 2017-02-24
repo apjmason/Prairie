@@ -76,8 +76,7 @@ public class PrairieGUI {
 			list.Add (default(T));
 		}
 		EditorGUI.indentLevel -= 1;
-
-		return (T[])list.ToArray ();
+        return (T[])list.ToArray ();
 	}
 
 	public static T[] drawPrimitiveList <T> (string title, T[] array) where T : IConvertible
@@ -123,7 +122,7 @@ public class PrairieGUI {
 			list.Add (default(T));
 		}
 		EditorGUI.indentLevel -= 1;
-		return (T[])list.ToArray ();
+        return (T[])list.ToArray ();
 	}
 
 	public static List<int> drawTwineNodeDropdownList (string listTitle, string itemTitle, TwineNode[] nodes, List<int> selectedIndices)
@@ -160,4 +159,23 @@ public class PrairieGUI {
 
 		return selectedIndices;
 	}
+
+    /// <summary>
+    /// Removes all null values from an array
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <returns></returns>
+    public static T[] RemoveNulls<T>(T[] array) where T : UnityEngine.Object
+    {
+        List<T> list = new List<T>();
+        foreach (T item in array)
+        {
+            if (item != null)
+            {
+                list.Add(item);
+            }
+        }
+        return list.ToArray();
+    }
 }

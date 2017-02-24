@@ -5,17 +5,25 @@ using UnityEditor;
 public class TriggerInteractionEditor : Editor {
 
 	TriggerInteraction trigger;
+    GameObject[] editorTriggeredObjects = new GameObject[0];
 
 	public override void OnInspectorGUI ()
 	{
 		this.trigger = (TriggerInteraction)target;
 
+        if (editorTriggeredObjects.Length == 0)
+        {
+            editorTriggeredObjects = trigger.triggeredObjects;
+        }
+
 		// Principle Configuration:
 		trigger.repeatable = EditorGUILayout.Toggle ("Repeatable?", trigger.repeatable);
 		trigger.triggeredObjects = PrairieGUI.drawObjectList<GameObject> ("Trigger Objects:", trigger.triggeredObjects);
 
-		// Warnings:
-		this.DrawWarnings();
+        trigger.triggeredObjects = PrairieGUI.RemoveNulls(editorTriggeredObjects);
+
+        // Warnings:
+        this.DrawWarnings();
 		if (GUI.changed) {
 			EditorUtility.SetDirty(trigger);
 		}

@@ -7,16 +7,24 @@ using System.Linq;
 [CustomEditor(typeof(TwineNode))]
 public class TwineNodeEditor : Editor {
 
-
 	TwineNode node;
+    GameObject[] editorTriggeredObjects = new GameObject[0];
 
-	public override void OnInspectorGUI ()
+    public override void OnInspectorGUI ()
 	{
 		node = (TwineNode)target;
 
-		node.isDecisionNode = EditorGUILayout.Toggle ("Decision node?", node.isDecisionNode);
-		node.objectsToTrigger = PrairieGUI.drawObjectList ("Objects To Trigger", node.objectsToTrigger);
-		EditorGUILayout.LabelField ("Name", node.name);
+        if (editorTriggeredObjects.Length == 0)
+        {
+            editorTriggeredObjects = node.objectsToTrigger;
+        }
+
+        node.isDecisionNode = EditorGUILayout.Toggle ("Decision node?", node.isDecisionNode);
+        editorTriggeredObjects = PrairieGUI.drawObjectList ("Objects To Trigger", editorTriggeredObjects);
+
+        node.objectsToTrigger = PrairieGUI.RemoveNulls(editorTriggeredObjects);
+
+        EditorGUILayout.LabelField ("Name", node.name);
 		EditorGUILayout.LabelField ("Content");
 		EditorGUI.indentLevel += 1;
 		node.content = EditorGUILayout.TextArea (node.content);
