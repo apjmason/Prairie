@@ -23,6 +23,9 @@ public class FirstPersonInteractor : MonoBehaviour
 	void Start ()
 	{
 		viewpoint = Camera.main;
+		if (gunMode) {
+			this.interactionRange = 1000;
+		}
 	}
 
 	void Update ()
@@ -63,6 +66,11 @@ public class FirstPersonInteractor : MonoBehaviour
 			return;
 		}
 
+		if (this.gunMode)
+		{
+			// draw that gun dawg
+			GUI.DrawTexture(new Rect(Screen.width - Screen.width/2.5f, Screen.height - Screen.height/2.5f, Screen.width/2.5f, Screen.height/2.5f), this.gunTexture);
+		}
 
 		if (this.highlightedObject != null)
 		{
@@ -255,6 +263,25 @@ public class FirstPersonInteractor : MonoBehaviour
 		Vector3 forward = this.transform.TransformDirection (Vector3.forward) * this.interactionRange;
 
 		Gizmos.DrawRay(origin, forward);
+	}
+
+	// --- Easter Eggs ---
+
+	[HideInInspector]
+	private bool gunMode = false;
+	[HideInInspector]
+	private Texture gunTexture;
+
+	internal void SetGunMode(bool value)
+	{
+		this.gunMode = value;
+		this.gunTexture = Resources.Load("fpgun") as Texture;
+		if (this.gunMode)
+		{
+			this.interactionRange = 10000;
+		} else {
+			this.interactionRange = 3;	// some default
+		}
 	}
 
 }
