@@ -2,6 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(Prompt))]
+// Interface for interaction that requires modification of the prompt displayed
 public abstract class PromptInteraction : Interaction
 {
     /// <summary>
