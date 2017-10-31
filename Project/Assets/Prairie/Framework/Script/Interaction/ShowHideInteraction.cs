@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShowHideInteraction : PromptInteraction {
+public class ShowHideInteraction : Interaction {
 
 	// Use this for initialization
 	void Start () {
@@ -31,25 +31,17 @@ public class ShowHideInteraction : PromptInteraction {
 
 		return false;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if(Input.GetMouseButtonDown(0)) // Checks to see if left mouse button was clicked.
-		{
-			Debug.Log ("Clicked on " + this.gameObject.name);
-			PerformAction();
-		}
-	}
 
 	protected override void PerformAction () 
 	{
+		Debug.Log (this.gameObject.name + " is highlighted");
 		if (this.isTwineNode)
 		{
 			if (this.isAssociatedTwineNodeActive ()) {
 				Debug.Log ("Associated twine node of " + this.gameObject.name + " is currently active.");	
 				this.gameObject.GetComponent<Renderer>().enabled = !this.gameObject.GetComponent<Renderer>().enabled;
 			} else {
-				Debug.Log ("Associated twine node of " + this.gameObject.name + "is currently inactive.");
+				Debug.Log ("Associated twine node of " + this.gameObject.name + " is currently inactive.");
 			}
 		}
 	}
