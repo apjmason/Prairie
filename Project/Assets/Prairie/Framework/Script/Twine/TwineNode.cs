@@ -29,11 +29,18 @@ public class TwineNode : MonoBehaviour {
 	void Update ()
 	{
 		if (this.enabled) {
+			// Hide/Show the display of current active Twine Node when "Q" is pressed
+			// eg: hide the current prompt, etc.
 			if (Input.GetKeyDown (KeyCode.Q)) {
 				this.isMinimized = !this.isMinimized;
 			}
 
 			if (this.isDecisionNode) {
+				// TAB opens the options list if it's not already open
+				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
+					this.isOptionsGuiOpen = true;
+				}
+
 				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
 					// Press TAB to scroll through the children nodes
 					this.selectedOptionIndex = (this.selectedOptionIndex + 1) % (children.Length);
@@ -43,11 +50,6 @@ public class TwineNode : MonoBehaviour {
 				} else if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.E)) {
 					// E closes the options list
 					this.isOptionsGuiOpen = false;
-				}
-
-				// TAB opens the options list if it's not already open
-				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
-					this.isOptionsGuiOpen = true;
 				}
 			}
 		}
@@ -62,6 +64,8 @@ public class TwineNode : MonoBehaviour {
 			Rect frame = new Rect (10, 10, frameWidth, frameHeight);
 
 			GUI.BeginGroup (frame);
+
+			// Create GUIStyle for decision hint box
 			GUIStyle style = new GUIStyle (GUI.skin.box);
 			style.wordWrap = true;
 			style.fixedWidth = frameWidth;
@@ -96,7 +100,7 @@ public class TwineNode : MonoBehaviour {
 
 		} else if (this.enabled && this.isMinimized) {
 
-			// Draw minimized GUI instead
+			// Draw minimized GUI instead (tiny plus sign on the top left corner)
 			Rect frame = new Rect (10, 10, 10, 10);
 
 			GUI.Box (frame, "");
