@@ -57,6 +57,11 @@ public class FirstPersonInteractor : MonoBehaviour
 			this.AttemptReadAnnotation ();
 		}
 
+		if (Input.GetKeyDown (KeyCode.I)) {
+			// enable Key I for inventory
+			this.AttemptInteractInventory ();
+		}
+
 		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
 		if (areaAnnotationsInRange.Count != 0 && this.annotationsEnabled)
 		{
@@ -212,14 +217,22 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
 		{
-			if (i is Annotation)
+			if (i is InventoryInteraction)
 			{
 				i.Interact (this.gameObject);
 			}
 		}
 	}
 
-	private GameObject GetHighlightedObject()
+	private void AttemptInteractInventory ()
+	{
+		Debug.Log ("Attempt to interact with inventory, should see cursor");
+		// Hacky way of getting the inventory script in canvass. 
+		// Only work if only one inventory is attached to one player.
+		this.GetComponentsInChildren<Inventory> () [0].Interact (this.gameObject);
+	}
+
+	public GameObject GetHighlightedObject()
 	{
 		// perform a raycast from the main camera to an object in front of it
 		// the object must have a collider to be hit, and an `Interaction` to be added
@@ -265,6 +278,15 @@ public class FirstPersonInteractor : MonoBehaviour
 		if (playerCompTypeB != null)
 		{
 			playerCompTypeB.enabled = canMove;
+		}
+	}
+
+	public void SetUseCursor(bool useCursor)
+	{
+		if (useCursor) {
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.lockState = CursorLockMode.Confined;
+			Cursor.visible = true;
 		}
 	}
 

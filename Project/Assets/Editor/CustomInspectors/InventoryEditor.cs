@@ -4,14 +4,11 @@ using UnityEditor;
 public class InventoryEditor : Editor
 {
 	private bool[] showItemSlots = new bool[Inventory.numSlots];
-	private SerializedProperty objNameProperty;
-	private SerializedProperty objsProperty;
-	private const string inventoryPropobjNamesName = "objImages";
-	private const string inventoryPropobjsName = "objs";
+	private SerializedProperty inventoryContentsProperty;
+	private const string inventoryPropContentsName = "contents";
 	private void OnEnable ()
 	{
-		objNameProperty = serializedObject.FindProperty (inventoryPropobjNamesName);
-		objsProperty = serializedObject.FindProperty (inventoryPropobjsName);
+		inventoryContentsProperty = serializedObject.FindProperty (inventoryPropContentsName);
 	}
 	public override void OnInspectorGUI ()
 	{
@@ -30,13 +27,29 @@ public class InventoryEditor : Editor
 		showItemSlots[index] = EditorGUILayout.Foldout (showItemSlots[index], "Item slot " + index);
 		if (showItemSlots[index])
 		{
-			if (objNameProperty == null) {
-				Debug.Log ("objNameProperty is null");
+			if (inventoryContentsProperty == null) {
+				Debug.Log ("inventoryContentProperty is null");
 			}
-			EditorGUILayout.PropertyField (objNameProperty.GetArrayElementAtIndex (index));
-			EditorGUILayout.PropertyField (objsProperty.GetArrayElementAtIndex (index));
+			SerializedProperty serialized_ic = inventoryContentsProperty.GetArrayElementAtIndex (index);
+			ShowRelativeProperty (serialized_ic, "objName");
+			ShowRelativeProperty (serialized_ic, "obj");
 		}
 		EditorGUI.indentLevel--;
 		EditorGUILayout.EndVertical ();
+	}
+
+	// Show child property of parent serializedProperty for a custom class
+	private void ShowRelativeProperty(SerializedProperty serializedProperty, string propertyName)
+	{
+		SerializedProperty property = serializedProperty.FindPropertyRelative(propertyName);
+		if (property != null)
+		{
+			EditorGUI.indentLevel++;
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(property, true);
+			if (EditorGUI.EndChangeCheck())
+				serializedObject.ApplyModifiedProperties();
+			EditorGUI.indentLevel--;
+		}
 	}
 }
