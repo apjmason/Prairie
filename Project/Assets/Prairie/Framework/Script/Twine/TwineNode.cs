@@ -29,68 +29,62 @@ public class TwineNode : MonoBehaviour {
 	void Update ()
 	{
 		if (this.enabled) {
-			if (Input.GetKeyDown (KeyCode.Q)) {
-				this.isMinimized = !this.isMinimized;
-			}
-
 			if (this.isDecisionNode) {
-				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
-					// Press TAB to scroll through the children nodes
-					this.selectedOptionIndex = (this.selectedOptionIndex + 1) % (children.Length);
-				} else if (this.isOptionsGuiOpen && (Input.GetKeyDown (KeyCode.KeypadEnter) || Input.GetKeyDown (KeyCode.Return))) {
-					// Press ENTER or RETURN to select that child
-					this.ActivateChildAtIndex (selectedOptionIndex);
-				} else if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.E)) {
-					// E closes the options list
-					this.isOptionsGuiOpen = false;
-				}
-
-				// TAB opens the options list if it's not already open
-				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
-					this.isOptionsGuiOpen = true;
-				}
-			}
+			    this.isOptionsGuiOpen = true;
+			} else if (Input.GetKeyDown(KeyCode.Q)) {
+                this.isMinimized = !this.isMinimized;
+            }
 		}
 	}
 
 	public void OnGUI()
 	{
 		if (this.enabled && !this.isMinimized) {
+            float horizontalAlign;
+            float verticalAlign;
+            float frameWidth;
+            float frameHeight;
+            if (!this.isDecisionNode) {
+                horizontalAlign = 10;
+                verticalAlign = 10;
+                frameWidth = Math.Min(Screen.width / 3, 350);
+                frameHeight = Math.Min(Screen.height / 2, 500);
+            } else {
+                frameWidth = Math.Min(Screen.width / 3, 500);
+                frameHeight = Math.Min(Screen.height / 2, 350);
+                horizontalAlign = (Screen.width - frameWidth) / 2;
+                verticalAlign = Screen.height - frameHeight;
+            }
+            Rect frame = new Rect(horizontalAlign, verticalAlign, frameWidth, frameHeight);
 
-			float frameWidth = Math.Min(Screen.width / 3, 350);
-			float frameHeight = Math.Min(Screen.height / 2, 500);
-			Rect frame = new Rect (10, 10, frameWidth, frameHeight);
-
-			GUI.BeginGroup (frame);
+            GUI.BeginGroup (frame);
 			GUIStyle style = new GUIStyle (GUI.skin.box);
+            style.normal.textColor = Color.white;
 			style.wordWrap = true;
 			style.fixedWidth = frameWidth;
 			GUILayout.Box (this.content, style);
 
-			if (isDecisionNode) {
-				GUIStyle decisionHintStyle = new GUIStyle (style);
-				decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
-
-				if (!isOptionsGuiOpen) {
-					GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
-				} else {
-					GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
-				}
-			}
-
-			if (this.isOptionsGuiOpen) {
-				// Draw list of buttons for the possible children nodes to visit:
-				GUIStyle optionButtonStyle = new GUIStyle (GUI.skin.button);
-				optionButtonStyle.fontStyle = FontStyle.Italic;
-				optionButtonStyle.wordWrap = true;
-
-				// Set highlighted button to have green text (this state is called `onNormal`):
-				optionButtonStyle.onNormal.textColor = Color.white;
-				// Set non-highlighted buttons to have grayed out text (state is called `normal`)
-				optionButtonStyle.normal.textColor = Color.gray;
-
-				selectedOptionIndex = GUILayout.SelectionGrid(selectedOptionIndex, this.childrenNames, 1, optionButtonStyle);
-			}
+            FirstPersonInteractor player = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
+            if (this.isOptionsGuiOpen)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                player.SetCanMove(false);
+                player.SetDrawsGUI(false);
+                for (int index = 0; index < this.childrenNames.Length; index++)
+                {
+                    if (GUILayout.Button(this.childrenNames[index]))
+                    {
+                        this.ActivateChildAtIndex(index);
+                    }
+                }
+            }
+            else {
+                player.SetCanMove(true);
+                player.SetDrawsGUI(true);
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
 			
 			GUI.EndGroup ();
 
