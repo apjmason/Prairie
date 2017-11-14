@@ -217,7 +217,7 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
 		{
-			if (i is InventoryInteraction)
+			if (i is Annotation)
 			{
 				i.Interact (this.gameObject);
 			}
