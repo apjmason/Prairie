@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
+//This script is responsible for the door swivelling mechanic, essentially turns an object 90 degrees
+//on a hinge
 [AddComponentMenu("Prairie/Interactions/Door Swivel")]
 public class Swivel : PromptInteraction
 {
@@ -17,6 +20,7 @@ public class Swivel : PromptInteraction
 	private float localz;
 	private bool closed = true;
 
+	//When script is enabled, it sets the hinge and direction of movement
 	void Start()
 	{
 		hinge = this.transform.position;
@@ -33,6 +37,7 @@ public class Swivel : PromptInteraction
 		dimensions.Add(localy);
 		dimensions.Add(localz);
 		dimensions.Sort();
+		//Here is where they assume that the object looks like a door, and the width is the middle length
 		float width = dimensions[1];
 
 		if (width == localx)
@@ -63,6 +68,9 @@ public class Swivel : PromptInteraction
 		}
 	}
 
+	//I still don't know how PerformAction() is called, but this changes target angle,
+	//Which allows update to trigger and call rotate, which will rotate the object based
+	//on the start() method hinge and direction output
 	protected override void PerformAction()
 	{
 		if (closed)
@@ -76,6 +84,7 @@ public class Swivel : PromptInteraction
 		closed = !closed;
 	}
 
+	//called every frame, when PerformAction() is called this will call rotate
 	void Update()
 	{
 		if (targetAngle != 0)
@@ -84,6 +93,7 @@ public class Swivel : PromptInteraction
 		}
 	}
 
+	//Function that is responsible for rotation movement, changes based on open or closed, resets targetAngle
 	protected void Rotate()
 	{
 		if (targetAngle > 0)
@@ -98,6 +108,7 @@ public class Swivel : PromptInteraction
 		}
 	}
 
+	//Override the default prompt
 	override public string defaultPrompt {
 		get {
 			return "Open/Close Door";
