@@ -40,24 +40,24 @@ public class TwineNode : MonoBehaviour {
 	public void OnGUI()
 	{
 		if (this.enabled && !this.isMinimized) {
-            float horizontalAlign;
-            float verticalAlign;
-            float frameWidth;
-            float frameHeight;
-            if (!this.isDecisionNode) {
-                horizontalAlign = 10;
-                verticalAlign = 10;
-                frameWidth = Math.Min(Screen.width / 3, 350);
-                frameHeight = Math.Min(Screen.height / 2, 500);
-            } else {
-                frameWidth = Math.Min(Screen.width / 3, 500);
-                frameHeight = Math.Min(Screen.height / 2, 350);
-                horizontalAlign = (Screen.width - frameWidth) / 2;
-                verticalAlign = Screen.height - frameHeight;
-            }
-            Rect frame = new Rect(horizontalAlign, verticalAlign, frameWidth, frameHeight);
+      float horizontalAlign;
+      float verticalAlign;
+      float frameWidth;
+      float frameHeight;
+      if (!this.isDecisionNode) {
+          horizontalAlign = 10;
+          verticalAlign = 10;
+          frameWidth = Math.Min(Screen.width / 3, 350);
+          frameHeight = Math.Min(Screen.height / 2, 500);
+      } else {
+          frameWidth = Math.Min(Screen.width / 3, 500);
+          frameHeight = Math.Min(Screen.height / 2, 350);
+          horizontalAlign = (Screen.width - frameWidth) / 2;
+          verticalAlign = Screen.height - frameHeight;
+      }
+      Rect frame = new Rect(horizontalAlign, verticalAlign, frameWidth, frameHeight);
 
-            GUI.BeginGroup (frame);
+      GUI.BeginGroup (frame);
 			GUIStyle style = new GUIStyle (GUI.skin.box);
             style.normal.textColor = Color.white;
 			style.wordWrap = true;
@@ -90,7 +90,7 @@ public class TwineNode : MonoBehaviour {
 
 		} else if (this.enabled && this.isMinimized) {
 
-			// Draw minimized GUI instead
+			// Draw minimized GUI instead (tiny plus sign on the top left corner)
 			Rect frame = new Rect (10, 10, 10, 10);
 
 			GUI.Box (frame, "");

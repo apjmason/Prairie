@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [AddComponentMenu("Prairie/Utility/Prompt")]
 public class Prompt : MonoBehaviour 
 {
+	// Only allow maximum 2 prompts, if not twine prompt (1 prompt only)
     private static readonly int FIRST_PROMPT = 1;
     private static readonly int SECOND_PROMPT = 2;
 
@@ -17,6 +18,9 @@ public class Prompt : MonoBehaviour
     // if an AssociatedTwineNode interaction is present on the gameobject, then this
     // dictionary overrides all other prompt information
 	public SerializedStringDictionary twinePrompts = new SerializedStringDictionary();
+
+	// Potentially override object prompt with twine prompt 
+	// if the object has AssociatedTwineNode 
 	public bool isTwinePrompt
     {
         get { return this.gameObject.GetComponent<AssociatedTwineNodes>() != null; }
