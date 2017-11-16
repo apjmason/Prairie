@@ -5,6 +5,8 @@ using System.Collections;
 public class TriggerInteraction : PromptInteraction
 {
 
+	//I think that this script is responsible for triggering interaction scripts
+	//that are attached to objects the player wants to interact with.
     public GameObject[] triggeredObjects = new GameObject[0];
 
 	protected override void PerformAction()
@@ -15,6 +17,7 @@ public class TriggerInteraction : PromptInteraction
         }
     }
 
+	//Overriding the default prompt
 	override public string defaultPrompt {
 		get {
 			return "Trigger Something";
