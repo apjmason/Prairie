@@ -2,26 +2,41 @@
 using System.Collections.Generic;
 using UnityStandardAssets.Characters.FirstPerson;
 
+// Required to use with First Person Controller Component
 [AddComponentMenu("Prairie/Player/First Person Interactor")]
 public class FirstPersonInteractor : MonoBehaviour
 {
-	// Raycast-related
+	// Raycast-related: Raycasting is the process of an invisible ray from a point, 
+	// specified direction to detect whether colliders lay in the path of the ray.
+
+	// Default interaction range: how far away can the character trigger object interactions
 	public float interactionRange = 3;
 	private Camera viewpoint;
 
 	// Selection-related
+
+	// The object the player is currently looking at
 	private GameObject highlightedObject;
+	// List of potential annotation objects the player could reach
 	public List<Annotation> areaAnnotationsInRange = new List<Annotation>();
 	public bool annotationsEnabled = true;
 
 	// Control-related
+
+	// By default, Unity use the same logic for each variable; 
+	// private are NonSerialized and HideInInspector; public are SerializeField (and shown in inspector).
+	//	- HideInInspector make sure a variable is not displayed.
+	//	- NonSerialized make sure a variable state is reset to default on game state change.
+	//	- SerializeField make sure a variable value instance has its own default value.
 	[HideInInspector]
+
 	private bool drawsGUI = true;
 
 	/// --- Game Loop ---
 
 	void Start ()
 	{
+		// set start point to main camera
 		viewpoint = Camera.main;
 	}
 
@@ -33,20 +48,28 @@ public class FirstPersonInteractor : MonoBehaviour
 		// process input
 		if (Input.GetMouseButtonDown (0))
 		{
-			// left click
+			// enable left click for regular interaction
 			this.AttemptInteract ();
 		}
 		if (Input.GetMouseButtonDown (1))
 		{
-			// right click
+			// enable right click for annotation
 			this.AttemptReadAnnotation ();
 		}
+
+		if (Input.GetKeyDown (KeyCode.I)) {
+			// enable Key I for inventory
+			this.AttemptInteractInventory ();
+		}
+
+		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
 		if (areaAnnotationsInRange.Count != 0 && this.annotationsEnabled)
 		{
 			for (int a = 0; a < areaAnnotationsInRange.Count; a++)
 			{
 				if (Input.GetKeyDown ((a+1).ToString()))
 				{
+					// Player interact with the selected annotation object
 					areaAnnotationsInRange[a].Interact (this.gameObject);
 				}
 			}
@@ -99,6 +122,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		GUI.Box (frame, "");
 	}
 
+	// Draw the Area Annotation box in the game (lower left corner)
 	private void drawToolbar(List<Annotation> annotations)
 	{
 		if (annotations.Count != 0 && this.annotationsEnabled)
@@ -140,6 +164,9 @@ public class FirstPersonInteractor : MonoBehaviour
 	}
 
 	/// --- Trigger Areas ---
+
+	// Public method override event driven functions
+	// Handles annotation trigger w/ Colliders
 	public void OnTriggerEnter(Collider other)
 	{
 		GameObject inside = other.gameObject;
@@ -197,7 +224,15 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 	}
 
-	private GameObject GetHighlightedObject()
+	private void AttemptInteractInventory ()
+	{
+		Debug.Log ("Attempt to interact with inventory, should see cursor");
+		// Hacky way of getting the inventory script in canvass. 
+		// Only work if only one inventory is attached to one player.
+		this.GetComponentsInChildren<Inventory> () [0].Interact (this.gameObject);
+	}
+
+	public GameObject GetHighlightedObject()
 	{
 		// perform a raycast from the main camera to an object in front of it
 		// the object must have a collider to be hit, and an `Interaction` to be added
@@ -246,7 +281,20 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 	}
 
-	// --- Gizmos ---
+	public void SetUseCursor(bool useCursor)
+	{
+		if (useCursor) {
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.lockState = CursorLockMode.Confined;
+			Cursor.visible = true;
+		}
+	}
+
+	// --- Gizmos --- (Used in editor mode) 
+	// Gizmos are used to give visual debugging or setup aids in the scene view. 
+	// All gizmo drawing has to be done in either OnDrawGizmos or OnDrawGizmosSelected functions of the script.
+	// OnDrawGizmos is called every frame. All gizmos rendered within OnDrawGizmos are pickable. 
+	// OnDrawGizmosSelected is called only if the object the script is attached to is selected.
 
 	void OnDrawGizmosSelected() {
 		Gizmos.color = Color.gray;

@@ -55,14 +55,14 @@ Assembly-UnityScript.unityProj
 ehthumbs.db
 [Tt]humbs.db
 [Dd]esktop.ini
-
 # ================ #
 # Project-specific #
 # ================ #
 [Ii]gnored/
+[Ii]gnored.meta
 Standard\ Assets/
 Standard\ Assets.meta
 CrossPlatformInput/
 CrossPlatformInput.meta
-
 ProjectSettings/
+ProjectSettings.meta
