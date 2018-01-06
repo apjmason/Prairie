@@ -20,19 +20,50 @@ public class TwineNode : MonoBehaviour {
 	public string[] childrenNames;
 	public List<GameObject> parents = new List<GameObject> ();
 	public bool isDecisionNode;
-
+    
 	private bool isMinimized = false;
 	private bool isOptionsGuiOpen = false;
+    private bool isActive = true;
 
 	private int selectedOptionIndex = 0;
+    
+    public static List<TwineNode> TwineNodeList = new List<TwineNode>();
+    private int visibleNodeIndex = 0;
 
 	void Update ()
 	{
 		if (this.enabled) {
-			if (this.isDecisionNode) {
-				this.isOptionsGuiOpen = true;
-			} else if (Input.GetKeyDown(KeyCode.Q)) {
+            if (!TwineNodeList.Contains(this)){
+                TwineNodeList.Add(this);
+//                print("printing");
+                print(TwineNodeList.Count);
+                    foreach (TwineNode item in TwineNodeList) {
+                        print(item.name);
+                    }
+                    if (TwineNodeList.Count > 1){
+                        this.isMinimized = true;
+                    }
+                }
+			if (Input.GetKeyDown (KeyCode.Q)) {
 				this.isMinimized = !this.isMinimized;
+			}
+
+			if (this.isDecisionNode) {
+				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
+					// Press TAB to scroll through the children nodes
+					this.selectedOptionIndex = (this.selectedOptionIndex + 1) % (children.Length);
+				} else if (this.isOptionsGuiOpen && (Input.GetKeyDown (KeyCode.KeypadEnter) || Input.GetKeyDown (KeyCode.Return))) {
+					// Press ENTER or RETURN to select that child
+					this.ActivateChildAtIndex (selectedOptionIndex);
+				} else if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.E)) {
+					// E closes the options list
+					this.isOptionsGuiOpen = false;
+				}
+
+				// TAB opens the options list if it's not already open
+				if (!this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
+					this.isOptionsGuiOpen = true;
+				}
 			}
 		}
 	}
@@ -40,59 +71,51 @@ public class TwineNode : MonoBehaviour {
 	public void OnGUI()
 	{
 		if (this.enabled && !this.isMinimized) {
-			float horizontalAlign;
-			float verticalAlign;
-			float frameWidth;
-			float frameHeight;
-			if (!this.isDecisionNode) {
-				horizontalAlign = 10;
-				verticalAlign = 10;
-				frameWidth = Math.Min(Screen.width / 3, 350);
-				frameHeight = Math.Min(Screen.height / 2, 500);
-			} else {
-				frameWidth = Math.Min(Screen.width / 3, 500);
-				frameHeight = Math.Min(Screen.height / 2, 350);
-				horizontalAlign = (Screen.width - frameWidth) / 2;
-				verticalAlign = Screen.height - frameHeight;
-			}
-			
-			Rect frame = new Rect(horizontalAlign, verticalAlign, frameWidth, frameHeight);
+
+			float frameWidth = Math.Min(Screen.width / 3, 350);
+			float frameHeight = Math.Min(Screen.height / 2, 500);
+			Rect frame = new Rect (10, 10, frameWidth, frameHeight);
 
 			GUI.BeginGroup (frame);
 			GUIStyle style = new GUIStyle (GUI.skin.box);
-            		style.normal.textColor = Color.white;
 			style.wordWrap = true;
 			style.fixedWidth = frameWidth;
 			GUILayout.Box (this.content, style);
 
-            		FirstPersonInteractor player = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
-			if (this.isOptionsGuiOpen)
-			{
-				Cursor.visible = true;
-				Cursor.lockState = CursorLockMode.None;
-				player.SetCanMove(false);
-				player.SetDrawsGUI(false);
-				for (int index = 0; index < this.childrenNames.Length; index++)
-				{
-					if (GUILayout.Button(this.childrenNames[index]))
-					{
-						this.ActivateChildAtIndex(index);
-					}
+			if (isDecisionNode) {
+				GUIStyle decisionHintStyle = new GUIStyle (style);
+				decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
+
+				if (!isOptionsGuiOpen) {
+					GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
+				} else {
+					GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
 				}
-			} else {
-				player.SetCanMove(true);
-				player.SetDrawsGUI(true);
-				Cursor.visible = false;
-				Cursor.lockState = CursorLockMode.Locked;
+			}
+
+			if (this.isOptionsGuiOpen) {
+				// Draw list of buttons for the possible children nodes to visit:
+				GUIStyle optionButtonStyle = new GUIStyle (GUI.skin.button);
+				optionButtonStyle.fontStyle = FontStyle.Italic;
+				optionButtonStyle.wordWrap = true;
+
+				// Set highlighted button to have green text (this state is called `onNormal`):
+				optionButtonStyle.onNormal.textColor = Color.white;
+				// Set non-highlighted buttons to have grayed out text (state is called `normal`)
+				optionButtonStyle.normal.textColor = Color.gray;
+
+				selectedOptionIndex = GUILayout.SelectionGrid(selectedOptionIndex, this.childrenNames, 1, optionButtonStyle);
 			}
 			
 			GUI.EndGroup ();
 
 		} else if (this.enabled && this.isMinimized) {
 
-			// Draw minimized GUI instead (tiny plus sign on the top left corner)
+			// Draw minimized GUI instead
 			Rect frame = new Rect (10, 10, 10, 10);
+
 			GUI.Box (frame, "");
+
 		}
 	
 	}
@@ -121,6 +144,7 @@ public class TwineNode : MonoBehaviour {
 	{
 		if (!this.enabled && this.HasActiveParentNode()) 
 		{
+//            TwineNodeList.Add(this);
 			this.enabled = true;
 			this.isMinimized = false;
 			this.isOptionsGuiOpen = false;
@@ -155,7 +179,14 @@ public class TwineNode : MonoBehaviour {
 	public void Deactivate() 
 	{
 		this.enabled = false;
+        TwineNodeList.Remove(this);
+        print("deactivate" + TwineNodeList.Count);
 	}
+
+//    public void AddToList()
+//    {
+//        TwineNodeList.Add(this);
+//    }
 
 	/// <summary>
 	/// Check if this Twine Node has an active parent node.
@@ -185,3 +216,6 @@ public class TwineNode : MonoBehaviour {
 		}
 	}
 }
+
+//List<TwineNode> TwineNodeList = new List<TwineNode>();
+//TwineNodeList.Add(new TwineNode(this.pid);
