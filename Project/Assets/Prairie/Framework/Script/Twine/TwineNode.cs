@@ -40,13 +40,19 @@ public class TwineNode : MonoBehaviour {
                     foreach (TwineNode item in TwineNodeList) {
                         print(item.name);
                     }
-                    if (TwineNodeList.Count > 1){
-                        this.isMinimized = true;
-                    }
+//                    if (TwineNodeList.Count > 1){
+//                        this.isMinimized = true;
+//                    }
                 }
-			if (Input.GetKeyDown (KeyCode.Q)) {
-				this.isMinimized = !this.isMinimized;
-			}
+            if (FindIndex(this) == visibleNodeIndex) {
+                this.isMinimized = false;
+            }
+            else {
+                this.isMinimized = true;
+            }
+//			if (Input.GetKeyDown (KeyCode.Q)) {
+//				this.isMinimized = !this.isMinimized;
+//			}
 
 			if (this.isDecisionNode) {
 				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
