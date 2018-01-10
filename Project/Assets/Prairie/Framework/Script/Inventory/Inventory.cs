@@ -36,6 +36,7 @@ public class Inventory : Interaction
 				return;
 			}
 		}
+		Debug.Log ("Cannot add " + objToAdd.name + "to Inventory. Inventory full.");
 	}
 
 	public void RemoveFromInventory (GameObject objToRemove)
@@ -48,6 +49,7 @@ public class Inventory : Interaction
 				return;
 			}
 		}
+		Debug.Log ("Cannot remove " + objToRemove.name + "from Inventory. Object not found.");
 	}
 
 	protected override void PerformAction()

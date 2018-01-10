@@ -58,8 +58,18 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 
 		if (Input.GetKeyDown (KeyCode.I)) {
-			// enable Key I for inventory
+			// enable Key I for interating with inventory UI
 			this.AttemptInteractInventory ();
+		}
+
+		if (Input.GetKeyDown (KeyCode.X)) {
+			// enable Key X for add to inventory
+			this.AttemptAddToInventory ();
+		}
+
+		if (Input.GetKeyDown (KeyCode.C)) {
+			// enable Key C for carrying the object
+			this.AttemptCarry ();
 		}
 
 		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
@@ -190,9 +200,10 @@ public class FirstPersonInteractor : MonoBehaviour
 		
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ())
 		{
-			if (i is Annotation)
+			if (i is Annotation || i is Inventory || i is InventoryInteraction || i is Carry)
 			{
-				// special cases, handled by `AttemptReadAnnotation`
+				// special cases, handled by 'AttemptReadAnnotation', 
+				// 'AttemptInteractInventory', AttemptAddToInventory', 'AttemptCarry' 
 				continue;
 			}
 
@@ -230,6 +241,36 @@ public class FirstPersonInteractor : MonoBehaviour
 		// Hacky way of getting the inventory script in canvass. 
 		// Only work if only one inventory is attached to one player.
 		this.GetComponentsInChildren<Inventory> () [0].Interact (this.gameObject);
+	}
+
+	private void AttemptAddToInventory ()
+	{
+		if (highlightedObject == null) {
+			return;
+		}
+
+		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
+		{
+			if (i is InventoryInteraction)
+			{
+				i.Interact (this.gameObject);
+			}
+		}
+	}
+
+	private void AttemptCarry ()
+	{
+		if (highlightedObject == null) {
+			return;
+		}
+
+		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
+		{
+			if (i is Carry)
+			{
+				i.Interact (this.gameObject);
+			}
+		}
 	}
 
 	public GameObject GetHighlightedObject()
