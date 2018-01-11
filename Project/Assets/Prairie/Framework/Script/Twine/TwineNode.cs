@@ -28,28 +28,49 @@ public class TwineNode : MonoBehaviour {
 	private int selectedOptionIndex = 0;
     
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
-    private int visibleNodeIndex = 0;
+    public static int visibleNodeIndex = 0;
+    private int index = -1;
 
 	void Update ()
 	{
 		if (this.enabled) {
+//            if (visibleNodeIndex == null) {
+//                visibleNodeIndex = 0;
+//            }
+            print(visibleNodeIndex);
+//            print(TwineNodeList.IndexOf(this));
             if (!TwineNodeList.Contains(this)){
                 TwineNodeList.Add(this);
+//                this.index = TwineNodeList.IndexOf(this);
 //                print("printing");
-                print(TwineNodeList.Count);
-                    foreach (TwineNode item in TwineNodeList) {
-                        print(item.name);
-                    }
+//                print(TwineNodeList.Count);
+//                    foreach (TwineNode item in TwineNodeList) {
+//                        print(item.name);
+//                    }
 //                    if (TwineNodeList.Count > 1){
 //                        this.isMinimized = true;
 //                    }
                 }
-            if (FindIndex(this) == visibleNodeIndex) {
+            if (Input.GetKeyDown (KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0){
+                if (visibleNodeIndex == TwineNodeList.Count - 1) {
+                    visibleNodeIndex = 0;
+                }
+                else {
+                    visibleNodeIndex++;
+                }
+            }
+            if (TwineNodeList.IndexOf(this) == visibleNodeIndex) {
                 this.isMinimized = false;
             }
             else {
                 this.isMinimized = true;
             }
+//            if (Input.GetKeyDown (KeyCode.Alpha0)) {
+//				visibleNodeIndex = 0;
+//			}
+//            if (Input.GetKeyDown (KeyCode.Alpha1)) {
+//				visibleNodeIndex = 1;
+//			}
 //			if (Input.GetKeyDown (KeyCode.Q)) {
 //				this.isMinimized = !this.isMinimized;
 //			}
@@ -148,13 +169,15 @@ public class TwineNode : MonoBehaviour {
 	/// <param name="interactor">The interactor.</param>
 	public bool Activate(GameObject interactor)
 	{
+//        print(TwineNodeList);
 		if (!this.enabled && this.HasActiveParentNode()) 
 		{
-//            TwineNodeList.Add(this);
 			this.enabled = true;
 			this.isMinimized = false;
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
+            TwineNodeList.Add(this);
+            visibleNodeIndex = TwineNodeList.IndexOf(this);
 			this.StartInteractions (interactor);
 
 			return true;
@@ -186,7 +209,7 @@ public class TwineNode : MonoBehaviour {
 	{
 		this.enabled = false;
         TwineNodeList.Remove(this);
-        print("deactivate" + TwineNodeList.Count);
+//        print("deactivate" + TwineNodeList.Count);
 	}
 
 //    public void AddToList()
@@ -222,6 +245,3 @@ public class TwineNode : MonoBehaviour {
 		}
 	}
 }
-
-//List<TwineNode> TwineNodeList = new List<TwineNode>();
-//TwineNodeList.Add(new TwineNode(this.pid);
