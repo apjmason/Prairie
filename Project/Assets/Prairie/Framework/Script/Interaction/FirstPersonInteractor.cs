@@ -62,13 +62,13 @@ public class FirstPersonInteractor : MonoBehaviour
 			this.AttemptInteractInventory ();
 		}
 
-		if (Input.GetKeyDown (KeyCode.X)) {
-			// enable Key X for add to inventory
+		if (Input.GetKeyDown (KeyCode.F)) {
+			// enable Key F for add to inventory
 			this.AttemptAddToInventory ();
 		}
 
-		if (Input.GetKeyDown (KeyCode.C)) {
-			// enable Key C for carrying the object
+		if (Input.GetKeyDown (KeyCode.E)) {
+			// enable Key E for carrying the object
 			this.AttemptCarry ();
 		}
 
