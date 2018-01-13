@@ -25,29 +25,33 @@ public class Inventory : Interaction
 
 	private bool active = false;
 
-	public void AddToInventory (GameObject objToAdd)
+	public bool AddToInventory (GameObject objToAdd)
 	{
 		for (int i = 0; i < contents.Length; i++) {
 			if (contents [i].obj == null) {
-				Debug.Log ("Add " + objToAdd.name + "to Inventory slot " + i.ToString () + ".");
+				Debug.Log ("Add " + objToAdd.name + " to Inventory slot " + i.ToString () + ".");
 				Text t = GetComponentsInChildren<Text> () [i];
 				t.text = objToAdd.name;
 				contents [i] = new InventoryContent(t, objToAdd);
-				return;
+				return true;
 			}
 		}
+		Debug.Log ("Cannot add " + objToAdd.name + " to Inventory. Inventory full.");
+		return false;
 	}
 
-	public void RemoveFromInventory (GameObject objToRemove)
+	public bool RemoveFromInventory (GameObject objToRemove)
 	{
 		for (int i = 0; i < contents.Length; i++) {
 			if (contents [i].obj == objToRemove) {
-				Debug.Log ("Remove " + objToRemove.name + "from Inventory slot " + i.ToString () + ".");
+				Debug.Log ("Remove " + objToRemove.name + " from Inventory slot " + i.ToString () + ".");
 				contents [i].objName.text = "Empty Slot";
 				contents [i].obj = null;
-				return;
+				return true;
 			}
 		}
+		Debug.Log ("Cannot remove " + objToRemove.name + " from Inventory. Object not found.");
+		return false;
 	}
 
 	protected override void PerformAction()
@@ -66,7 +70,7 @@ public class Inventory : Interaction
 	{
 		if (active)
 		{
-			if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Escape))
+			if (Input.GetKey(KeyCode.Q))
 			{
 				returnToGameStateFromInventory ();
 			}
@@ -105,7 +109,11 @@ public class Inventory : Interaction
 			InventoryContent ic = getInventoryContentFromName (t.text);
 			if (ic != null) {
 				DropAtCurrentLocation (ic.obj);
-				RemoveFromInventory (ic.obj);
+				if (RemoveFromInventory (ic.obj)) {
+					Debug.Log ("Remove Succeeded.");
+				} else {
+					Debug.Log ("Remove Not Succeeded.");
+				}
 				returnToGameStateFromInventory ();
 			}
 		}
