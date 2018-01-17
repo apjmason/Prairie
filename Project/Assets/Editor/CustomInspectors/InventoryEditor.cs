@@ -3,7 +3,7 @@ using UnityEditor;
 [CustomEditor(typeof(Inventory))]
 public class InventoryEditor : Editor
 {
-	private bool[] showItemSlots = new bool[Inventory.numSlots];
+	private bool[] showItemSlots = new bool[Inventory.NUMSLOTS];
 	private SerializedProperty inventoryContentsProperty;
 	private const string inventoryPropContentsName = "contents";
 	private void OnEnable ()
@@ -13,7 +13,7 @@ public class InventoryEditor : Editor
 	public override void OnInspectorGUI ()
 	{
 		serializedObject.Update ();
-		for (int i = 0; i < Inventory.numSlots; i++)
+		for (int i = 0; i < Inventory.NUMSLOTS; i++)
 		{
 			ItemSlotGUI (i);
 		}

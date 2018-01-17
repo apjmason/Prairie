@@ -20,8 +20,8 @@ public class InventoryContent
 public class Inventory : Interaction
 , IPointerClickHandler
 {	
-	public const int numSlots = 4;
-	public InventoryContent[] contents = new InventoryContent[numSlots];
+	public const int NUMSLOTS = 4;
+	public InventoryContent[] contents = new InventoryContent[NUMSLOTS];
 
 	private bool active = false;
 
