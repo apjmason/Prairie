@@ -109,7 +109,7 @@ public class Annotation : Interaction
                 player.SetDrawsGUI(false);
 
 				// Add summary annotation log to journal
-				if (addToJournal) {
+				if (addToJournal && annotationType == (int)AnnotationTypes.SUMMARY) {
 					player.GetComponentInChildren<Journal> ().AddToJournal (this);
 				}
             }
