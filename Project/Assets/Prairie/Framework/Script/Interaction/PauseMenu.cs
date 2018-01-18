@@ -52,17 +52,10 @@ public class PauseMenu : MonoBehaviour {
 	public void hideShowInventoryUI(){
 		if (showInventoryUI) {
 			showInventoryUI = false;
-			gameObject.transform.Find("Slot1").gameObject.SetActive (false);
-			gameObject.transform.Find("Slot2").gameObject.SetActive (false);
-			gameObject.transform.Find("Slot3").gameObject.SetActive (false);
-			gameObject.transform.Find("Slot4").gameObject.SetActive (false);
+			gameObject.transform.Find("InventoryPanel").gameObject.SetActive (false);
 		} else {
 			showInventoryUI = true;
-			gameObject.transform.Find("Slot1").gameObject.SetActive (true);
-			gameObject.transform.Find("Slot2").gameObject.SetActive (true);
-			gameObject.transform.Find("Slot3").gameObject.SetActive (true);
-			gameObject.transform.Find("Slot4").gameObject.SetActive (true);
-
+			gameObject.transform.Find("InventoryPanel").gameObject.SetActive (true);
 		}
 
 	}
