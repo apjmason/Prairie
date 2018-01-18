@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class JournalGui : MonoBehaviour {
-
+	private bool active = false;
 	private bool isJournalOpen = false;
+
+	void Start() {
+		gameObject.transform.Find("Journal").gameObject.SetActive (active);
+	}
 
 	// Update is called once per frame
 	void Update () {
@@ -33,5 +37,9 @@ public class JournalGui : MonoBehaviour {
 
 	public void closeJournal(){
 		gameObject.transform.Find("Journal").gameObject.SetActive (false);
+	}
+
+	public bool isOpen() {
+		return isJournalOpen;
 	}
 }
