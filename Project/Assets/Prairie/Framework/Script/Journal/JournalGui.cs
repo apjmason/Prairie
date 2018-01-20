@@ -6,8 +6,11 @@ public class JournalGui : MonoBehaviour {
 	private bool active = false;
 	private bool isJournalOpen = false;
 
+	// Name of the journal object in game scene.
+	private const string JOURNAL = "Journal";
+
 	void Start() {
-		gameObject.transform.Find("Journal").gameObject.SetActive (active);
+		gameObject.transform.Find(JOURNAL).gameObject.SetActive (active);
 	}
 
 	// Update is called once per frame
@@ -32,11 +35,11 @@ public class JournalGui : MonoBehaviour {
 
 
 	public void openJournal(){
-		gameObject.transform.Find("Journal").gameObject.SetActive (true);
+		gameObject.transform.Find(JOURNAL).gameObject.SetActive (true);
 	}
 
 	public void closeJournal(){
-		gameObject.transform.Find("Journal").gameObject.SetActive (false);
+		gameObject.transform.Find(JOURNAL).gameObject.SetActive (false);
 	}
 
 	public bool isOpen() {
