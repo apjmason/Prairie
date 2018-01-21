@@ -25,5 +25,10 @@ public class JournalEntry : ScriptableObject
 			return false;
 		return title.Equals(e.title);
 	}
+
+	public override int GetHashCode()
+	{
+		return title.GetHashCode ();
+	}
 }
 
