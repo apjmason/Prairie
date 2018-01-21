@@ -30,26 +30,18 @@ public class TwineNode : MonoBehaviour {
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
     public static int visibleNodeIndex = 0;
     private int index = -1;
+    private static bool fanfold = false;
+    private static float height = 0;
+    private bool heightAdded = false;
 
 	void Update ()
 	{
 		if (this.enabled) {
-//            if (visibleNodeIndex == null) {
-//                visibleNodeIndex = 0;
-//            }
-            print(visibleNodeIndex);
-//            print(TwineNodeList.IndexOf(this));
+            if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0){
+                fanfold = !fanfold;
+            }
             if (!TwineNodeList.Contains(this)){
                 TwineNodeList.Add(this);
-//                this.index = TwineNodeList.IndexOf(this);
-//                print("printing");
-//                print(TwineNodeList.Count);
-//                    foreach (TwineNode item in TwineNodeList) {
-//                        print(item.name);
-//                    }
-//                    if (TwineNodeList.Count > 1){
-//                        this.isMinimized = true;
-//                    }
                 }
             if (Input.GetKeyDown (KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0){
                 if (visibleNodeIndex == TwineNodeList.Count - 1) {
@@ -65,15 +57,7 @@ public class TwineNode : MonoBehaviour {
             else {
                 this.isMinimized = true;
             }
-//            if (Input.GetKeyDown (KeyCode.Alpha0)) {
-//				visibleNodeIndex = 0;
-//			}
-//            if (Input.GetKeyDown (KeyCode.Alpha1)) {
-//				visibleNodeIndex = 1;
-//			}
-//			if (Input.GetKeyDown (KeyCode.Q)) {
-//				this.isMinimized = !this.isMinimized;
-//			}
+
 
 			if (this.isDecisionNode) {
 				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
@@ -97,13 +81,50 @@ public class TwineNode : MonoBehaviour {
 
 	public void OnGUI()
 	{
-		if (this.enabled && !this.isMinimized) {
+        if (fanfold) {
+            float frameWidth = Math.Min(Screen.width / 3, 150);
+            float frameHeight = Math.Min(Screen.height / 2, 500);
+            index = TwineNodeList.IndexOf(this);
+            Rect frame = new Rect (10+index*150, 10, frameWidth, frameHeight);
+            GUI.BeginGroup (frame);
+			GUIStyle style = new GUIStyle (GUI.skin.box);
+			style.wordWrap = true;
+			style.fixedWidth = frameWidth;
+			GUILayout.Box (this.content, style);
 
-			float frameWidth = Math.Min(Screen.width / 3, 350);
-			float frameHeight = Math.Min(Screen.height / 2, 500);
-			Rect frame = new Rect (10, 10, frameWidth, frameHeight);
+			if (isDecisionNode) {
+				GUIStyle decisionHintStyle = new GUIStyle (style);
+				decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
 
-			GUI.BeginGroup (frame);
+				if (!isOptionsGuiOpen) {
+					GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
+				} else {
+					GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
+				}
+			}
+
+			if (this.isOptionsGuiOpen) {
+				// Draw list of buttons for the possible children nodes to visit:
+				GUIStyle optionButtonStyle = new GUIStyle (GUI.skin.button);
+				optionButtonStyle.fontStyle = FontStyle.Italic;
+				optionButtonStyle.wordWrap = true;
+
+				// Set highlighted button to have green text (this state is called `onNormal`):
+				optionButtonStyle.onNormal.textColor = Color.white;
+				// Set non-highlighted buttons to have grayed out text (state is called `normal`)
+				optionButtonStyle.normal.textColor = Color.gray;
+
+				selectedOptionIndex = GUILayout.SelectionGrid(selectedOptionIndex, this.childrenNames, 1, optionButtonStyle);
+			}
+			
+			GUI.EndGroup ();
+            
+        }
+        else if (this.enabled && !this.isMinimized) {
+            float frameWidth = Math.Min(Screen.width / 3, 350);
+            float frameHeight = Math.Min(Screen.height / 2, 500);
+            Rect frame = new Rect (10, 10, frameWidth, frameHeight);
+            GUI.BeginGroup (frame);
 			GUIStyle style = new GUIStyle (GUI.skin.box);
 			style.wordWrap = true;
 			style.fixedWidth = frameWidth;
@@ -169,14 +190,12 @@ public class TwineNode : MonoBehaviour {
 	/// <param name="interactor">The interactor.</param>
 	public bool Activate(GameObject interactor)
 	{
-//        print(TwineNodeList);
 		if (!this.enabled && this.HasActiveParentNode()) 
 		{
 			this.enabled = true;
 			this.isMinimized = false;
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
-            TwineNodeList.Add(this);
             visibleNodeIndex = TwineNodeList.IndexOf(this);
 			this.StartInteractions (interactor);
 
@@ -209,13 +228,7 @@ public class TwineNode : MonoBehaviour {
 	{
 		this.enabled = false;
         TwineNodeList.Remove(this);
-//        print("deactivate" + TwineNodeList.Count);
 	}
-
-//    public void AddToList()
-//    {
-//        TwineNodeList.Add(this);
-//    }
 
 	/// <summary>
 	/// Check if this Twine Node has an active parent node.
