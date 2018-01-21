@@ -21,8 +21,10 @@ public class Journal : MonoBehaviour
 		e.title = a.summary;
 		e.content = c.parsedText;
 		e.imagePaths = c.imagePaths;
-		journal.Add (e);
-		Debug.Log ("Add " + e.title + "'s annotation info to journal.");
 
+		if (!journal.Contains (e)) {
+			journal.Add (e);
+			Debug.Log ("Add " + e.title + "'s annotation info to journal.");
+		}
 	}
 }

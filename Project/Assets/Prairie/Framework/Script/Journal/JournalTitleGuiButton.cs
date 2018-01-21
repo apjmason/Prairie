@@ -43,7 +43,6 @@ public class JournalTitleGuiButton : MonoBehaviour
 		Text info = GameObject.Find(INFO).GetComponentInChildren<Text>();
 		info.text = "";
 		foreach (string c in e.content) {
-			info.text += "- ";
 			info.text += c;
 			info.text += '\n';
 		}
