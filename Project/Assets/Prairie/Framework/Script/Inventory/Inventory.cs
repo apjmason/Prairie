@@ -17,11 +17,10 @@ public class InventoryContent
 }
 	
 [AddComponentMenu("Prairie/Inventory/Inventory")]
-public class Inventory : Interaction
-, IPointerClickHandler
+public class Inventory : Interaction, IPointerClickHandler
 {	
-	public const int numSlots = 4;
-	public InventoryContent[] contents = new InventoryContent[numSlots];
+	public const int NUMSLOTS = 8;
+	public InventoryContent[] contents = new InventoryContent[NUMSLOTS];
 
 	private bool active = false;
 
@@ -107,7 +106,7 @@ public class Inventory : Interaction
 		Text t = eventData.pointerEnter.GetComponent<Text> ();
 		if (t != null) {
 			InventoryContent ic = getInventoryContentFromName (t.text);
-			if (ic != null) {
+			if (ic != null && ic.obj != null) {
 				DropAtCurrentLocation (ic.obj);
 				if (RemoveFromInventory (ic.obj)) {
 					Debug.Log ("Remove Succeeded.");
