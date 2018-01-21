@@ -5,6 +5,10 @@ using UnityEngine;
 public class JournalGui : MonoBehaviour {
 	private bool active = false;
 	private bool isJournalOpen = false;
+	private int startingEntry = 0;
+
+	public Transform contentPanel;
+	public GameObject prefab;
 
 	// Name of the journal object in game scene.
 	private const string JOURNAL = "Journal";
@@ -35,6 +39,7 @@ public class JournalGui : MonoBehaviour {
 
 
 	public void openJournal(){
+		AddButtons ();
 		gameObject.transform.Find(JOURNAL).gameObject.SetActive (true);
 	}
 
@@ -44,5 +49,22 @@ public class JournalGui : MonoBehaviour {
 
 	public bool isOpen() {
 		return isJournalOpen;
+	}
+
+	private void AddButtons()
+	{
+		List<JournalEntry> entries = gameObject.GetComponentInParent<Journal> ().journal;
+		for (int i = startingEntry; i < entries.Count; i++) 
+		{
+			JournalEntry e = entries[i];
+			GameObject newButton = (GameObject)GameObject.Instantiate(prefab);
+
+			newButton.transform.SetParent(contentPanel);
+
+			JournalTitleGuiButton jtgb = newButton.GetComponent<JournalTitleGuiButton>();
+			jtgb.Setup(e);
+
+			startingEntry += 1;
+		}
 	}
 }
