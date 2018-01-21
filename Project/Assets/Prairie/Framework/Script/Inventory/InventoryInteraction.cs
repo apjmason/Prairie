@@ -15,10 +15,13 @@ public class InventoryInteraction : Interaction
 
 	protected override void PerformAction () 
 	{
-		this.gameObject.SetActive (false);
 		// Hacky way of getting the inventory script in canvass. 
 		// Only work if only one inventory is attached to one player.
-		player.GetComponentsInChildren<Inventory> ()[0].AddToInventory (this.gameObject);
+		if (player.GetComponentInChildren<Inventory> ().AddToInventory (this.gameObject)) {
+			this.gameObject.SetActive (false);
+		} else {
+			Debug.Log ("Add Not Succeeded.");
+		}
 	}
 }
 

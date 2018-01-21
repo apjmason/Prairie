@@ -3,17 +3,22 @@ using UnityEditor;
 [CustomEditor(typeof(Inventory))]
 public class InventoryEditor : Editor
 {
-	private bool[] showItemSlots = new bool[Inventory.numSlots];
+	private bool[] showItemSlots = new bool[Inventory.NUMSLOTS];
 	private SerializedProperty inventoryContentsProperty;
-	private const string inventoryPropContentsName = "contents";
+
+	// String value needs to be the same as the instance variable name in the Inventory Script.
+	private const string INVENTORY_CONTENTS = "contents";
+	private const string OBJECT_NAME = "objName";
+	private const string OBJECT = "obj";
+
 	private void OnEnable ()
 	{
-		inventoryContentsProperty = serializedObject.FindProperty (inventoryPropContentsName);
+		inventoryContentsProperty = serializedObject.FindProperty (INVENTORY_CONTENTS);
 	}
 	public override void OnInspectorGUI ()
 	{
 		serializedObject.Update ();
-		for (int i = 0; i < Inventory.numSlots; i++)
+		for (int i = 0; i < Inventory.NUMSLOTS; i++)
 		{
 			ItemSlotGUI (i);
 		}
@@ -28,11 +33,11 @@ public class InventoryEditor : Editor
 		if (showItemSlots[index])
 		{
 			if (inventoryContentsProperty == null) {
-				Debug.Log ("inventoryContentProperty is null");
+				Debug.Log (INVENTORY_CONTENTS + " is null");
 			}
 			SerializedProperty serialized_ic = inventoryContentsProperty.GetArrayElementAtIndex (index);
-			ShowRelativeProperty (serialized_ic, "objName");
-			ShowRelativeProperty (serialized_ic, "obj");
+			ShowRelativeProperty (serialized_ic, OBJECT_NAME);
+			ShowRelativeProperty (serialized_ic, OBJECT);
 		}
 		EditorGUI.indentLevel--;
 		EditorGUILayout.EndVertical ();

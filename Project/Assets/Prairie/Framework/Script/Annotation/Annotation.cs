@@ -39,6 +39,9 @@ public class Annotation : Interaction
     public List<Texture2D> images;
     public string summary = "";
 
+	// Journal option
+	public bool addToJournal = true;
+
     private bool active = false;
 
     private GUIStyle fullStyle;
@@ -104,6 +107,11 @@ public class Annotation : Interaction
             {
                 player.SetCanMove(false);
                 player.SetDrawsGUI(false);
+
+				// Add summary annotation log to journal
+				if (addToJournal && annotationType == (int)AnnotationTypes.SUMMARY) {
+					player.GetComponentInChildren<Journal> ().AddToJournal (this);
+				}
             }
         }
         
@@ -249,6 +257,11 @@ public class Annotation : Interaction
 		else
 		{
 			interactor.areaAnnotationsInRange.Add(this);
+
+			// Add area annotation log to journal
+			if (addToJournal) {
+				interactor.GetComponentInChildren<Journal> ().AddToJournal (this);
+			}
 		}
 	}
 
