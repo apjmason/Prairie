@@ -21,10 +21,11 @@ public class TwineNode : MonoBehaviour {
 	public List<GameObject> parents = new List<GameObject> ();
 	public bool isDecisionNode;
 
-	private bool isMinimized = false;
-	private bool isOptionsGuiOpen = false;
+    public Dictionary<string, string> assignments = new Dictionary<string, string>();
+    public Dictionary<string, string[]> conditionals = new Dictionary<string, string[]>();
 
-	private int selectedOptionIndex = 0;
+    private bool isMinimized = false;
+	private bool isOptionsGuiOpen = false;
 
 	void Update ()
 	{
