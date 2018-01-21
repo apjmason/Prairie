@@ -3,17 +3,21 @@ using UnityEditor;
 [CustomEditor(typeof(Journal))]
 public class JournalEditor : Editor
 {
-	private bool[] showEntrySlots = new bool[Journal.NUMSLOTS];
+//	private bool[] showEntrySlots = new bool[Journal.NUMSLOTS];
 	private SerializedProperty journalEntriesProperty;
-	private const string journalPropContentName = "journal";
+	private const string JOURNAL = "journal";
+	private const string TITLE = "title";
+	private const string CONTENT = "content";
+	private const string IMG = "imagePaths";
+
 	private void OnEnable ()
 	{
-		journalEntriesProperty = serializedObject.FindProperty (journalPropContentName);
+		journalEntriesProperty = serializedObject.FindProperty (JOURNAL);
 	}
 	public override void OnInspectorGUI ()
 	{
 		serializedObject.Update ();
-		for (int i = 0; i < Journal.NUMSLOTS; i++)
+		for (int i = 0; i < journalEntriesProperty.arraySize; i++)
 		{
 			EntrySlotGUI (i);
 		}
@@ -24,17 +28,18 @@ public class JournalEditor : Editor
 		EditorGUILayout.BeginVertical (GUI.skin.box);
 		EditorGUI.indentLevel++;
 
-		showEntrySlots[index] = EditorGUILayout.Foldout (showEntrySlots[index], "Entry slot " + index);
-		if (showEntrySlots[index])
-		{
-			if (journalEntriesProperty == null) {
-				Debug.Log ("journalEntriesProperty is null");
-			}
-			SerializedProperty serialized_ic = journalEntriesProperty.GetArrayElementAtIndex (index);
-			ShowRelativeProperty (serialized_ic, "title");
-			ShowRelativeProperty (serialized_ic, "content");
-			ShowRelativeProperty (serialized_ic, "imagePaths");
+		EditorGUILayout.Foldout (true, "Entry " + index);
+
+		if (journalEntriesProperty == null) {
+			Debug.Log (JOURNAL+" is null.");
 		}
+
+		SerializedProperty serialized_ic = journalEntriesProperty.GetArrayElementAtIndex(index);
+
+		ShowRelativeProperty (serialized_ic, TITLE);
+		ShowRelativeProperty (serialized_ic, CONTENT);
+		ShowRelativeProperty (serialized_ic, IMG);
+
 		EditorGUI.indentLevel--;
 		EditorGUILayout.EndVertical ();
 	}
@@ -42,15 +47,20 @@ public class JournalEditor : Editor
 	// Show child property of parent serializedProperty for a custom class
 	private void ShowRelativeProperty(SerializedProperty serializedProperty, string propertyName)
 	{
-		SerializedProperty property = serializedProperty.FindPropertyRelative(propertyName);
-		if (property != null)
-		{
+		// Need to create a serializedObject then find children propert.
+		// Directly FindRelativeProperty from the parent serializedProperty returns null.
+		SerializedObject propObj = new SerializedObject(serializedProperty.objectReferenceValue);
+		SerializedProperty property = propObj.FindProperty(propertyName);
+
+		if (property != null) {
 			EditorGUI.indentLevel++;
-			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(property, true);
-			if (EditorGUI.EndChangeCheck())
-				serializedObject.ApplyModifiedProperties();
+			EditorGUI.BeginChangeCheck ();
+			EditorGUILayout.PropertyField (property, true);
+			if (EditorGUI.EndChangeCheck ())
+				serializedObject.ApplyModifiedProperties ();
 			EditorGUI.indentLevel--;
+		} else {
+			Debug.Log (propertyName+" property is null.");
 		}
 	}
 }
