@@ -119,7 +119,7 @@ public class TwineJsonParser {
     /// <returns>Variable expressions minus parentheses</returns>
     public static string[] GetVariableExpressions(string text)
     {
-        Regex expressionRegex = new Regex("\\(\\([^)]*[)][)]");
+        Regex expressionRegex = new Regex("\\(\\([^)]*\\)\\)");
         MatchCollection matches = expressionRegex.Matches(text);
         string[] strings = new string[matches.Count];
         int resultNum = 0;
@@ -209,15 +209,14 @@ public class TwineJsonParser {
 
     //TODO:  Update this.  At present, it just cuts everything off after the first single open bracket.  Bad.
     /// <summary>
-    /// Strips the list of children off the content,
-    /// because we really only want the content.
+    /// Returns the text of a node without links or variable expressions
     /// </summary>
     /// <returns>The content without children atached.</returns>
     /// <param name="content">Content with children attached.</param>
-    public static string RemoveTwineLinks (string content)
+    public static string GetVisibleText (string content)
 	{
-		string[] substrings = content.Split ('[');
-		return substrings[0];
+        Regex invisibleTextRegex = new Regex("(\\[\\[([^\\]]*)\\]\\])|(\\(\\([^)]*\\)\\))");
+        return invisibleTextRegex.Replace(content, "");
 	}
 
 	static string[] GetDequotedStringArrayFromJsonArray (JSONNode jsonNode)
