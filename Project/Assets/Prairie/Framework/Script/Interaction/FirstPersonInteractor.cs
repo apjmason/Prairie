@@ -20,6 +20,10 @@ public class FirstPersonInteractor : MonoBehaviour
 	// List of potential annotation objects the player could reach
 	public List<Annotation> areaAnnotationsInRange = new List<Annotation>();
 	public bool annotationsEnabled = true;
+	public bool worldFrozen = false;
+	public bool startMenuOpen = false;
+	public bool journalOpen = false;
+	public bool inventoryAccess = false;
 
 	// Control-related
 
@@ -71,6 +75,7 @@ public class FirstPersonInteractor : MonoBehaviour
 			// enable Key E for carrying the object
 			this.AttemptCarry ();
 		}
+			
 
 		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
 		if (areaAnnotationsInRange.Count != 0 && this.annotationsEnabled)
@@ -130,6 +135,42 @@ public class FirstPersonInteractor : MonoBehaviour
 	{
 		Rect frame = new Rect (Screen.width / 2, Screen.height / 2, 10, 10);
 		GUI.Box (frame, "");
+	}
+
+	//Set the world active or not
+	public void setWorldActive(string pauseType){
+		if (pauseType == "Pause Menu") {
+			if (startMenuOpen) {
+				startMenuOpen = false;
+			} else {
+				startMenuOpen = true;
+			}
+		}
+		if (pauseType == "Journal") {
+			if (journalOpen) {
+				journalOpen = false;
+			} else {
+				journalOpen = true;
+			}
+		}
+		if (pauseType == "Inventory") {
+			if (inventoryAccess) {
+				inventoryAccess = false;
+			} else {
+				inventoryAccess = true;
+			}
+		}
+
+		if (!startMenuOpen && !journalOpen && !inventoryAccess) {
+			Time.timeScale = 1;
+			Cursor.visible = false;
+			Cursor.lockState = CursorLockMode.Locked;
+		} else {
+			Time.timeScale = 0;
+			Cursor.visible = true;
+			Cursor.lockState = CursorLockMode.None;
+		}
+
 	}
 
 	// Draw the Area Annotation box in the game (lower left corner)
