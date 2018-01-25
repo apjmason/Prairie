@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+//using TwineVariables;
 using System;
 using System.Linq;
 
@@ -12,26 +13,39 @@ public class TwineNode : MonoBehaviour {
 	[HideInInspector]
 	public string pid;
 	public new string name;
+	public Dictionary<string, string> assignments = new Dictionary<string, string>();
+	public Dictionary<string, string> conditionals = new Dictionary<string, string>();
 	[HideInInspector]
 	public string[] tags;
 	public string content;
+	public string show = "";
 	public GameObject[] children;
 	[HideInInspector]
 	public string[] childrenNames;
 	public List<GameObject> parents = new List<GameObject> ();
 	public bool isDecisionNode;
+	public bool isConditionNode;
 
-    public Dictionary<string, string> assignments = new Dictionary<string, string>();
-    public Dictionary<string, string[]> conditionals = new Dictionary<string, string[]>();
+  public Dictionary<string, string> assignments = new Dictionary<string, string>();
+  public Dictionary<string, string[]> conditionals = new Dictionary<string, string[]>();
 
-    private bool isMinimized = false;
+  private bool isMinimized = false;
 	private bool isOptionsGuiOpen = false;
+	public TwineVariables variables;
 
 	void Update ()
 	{
 		if (this.enabled) {
 			if (this.isDecisionNode) {
 				this.isOptionsGuiOpen = true;
+			} else if (this.isConditionNode) {
+				// get the $color value from global list
+				// check the platform name by check $color:platform pair stored in condition node
+				// check child node name to match platform name
+				// activate childnode
+				this.ActivateChildAtIndex (0);
+				Debug.Log ("This is a Condition Node: " + this.name);
+
 			} else if (Input.GetKeyDown(KeyCode.Q)) {
 				this.isMinimized = !this.isMinimized;
 			}
@@ -124,6 +138,7 @@ public class TwineNode : MonoBehaviour {
 		{
 			this.enabled = true;
 			this.isMinimized = false;
+			// this.ParseContent();
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
 			this.StartInteractions (interactor);
@@ -184,5 +199,37 @@ public class TwineNode : MonoBehaviour {
 		{
 			parent.GetComponent<TwineNode> ().Deactivate ();
 		}
+	}
+
+
+	/// <summary>
+	/// Parse the content of the node and make according actions
+	/// </summary>
+	private void ParseContent()
+	{	
+		// if (this.assignments.Count != 0) {
+		// 	List<string> keyList = new List<string>(this.variables.Keys);
+		// 	foreach (string v in keyList) {
+		// 		if (this.assignments.ContainsKey(v)) {
+		// 			variables [v] = assignments[v];
+		// 		}
+		// 	}
+		// } else if (this.conditionals.Count != 0) {
+		// 	List<string[]> ifList = new List<string[]> (this.dicIf.Keys);
+		// 	foreach (string[] i in ifList) {
+		// 		if (string.Equals(variables [i[0]], i[1])) {
+		// 			show = dicIf [i].ToString();
+		// 		}
+		// 	}
+		// }
+
+	}
+
+	public Dictionary<string, string> getVariables() {
+		return this.variables.Variables();
+	}
+
+	public void iniVariables(string[] vars){
+		TwineVariables.GetTwineVariables(vars);
 	}
 }
