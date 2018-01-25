@@ -26,9 +26,11 @@ public class TwineNode : MonoBehaviour {
 	public bool isDecisionNode;
 	public bool isConditionNode;
 
-	private bool isMinimized = false;
-	private bool isOptionsGuiOpen = false;
+  public Dictionary<string, string> assignments = new Dictionary<string, string>();
+  public Dictionary<string, string[]> conditionals = new Dictionary<string, string[]>();
 
+  private bool isMinimized = false;
+	private bool isOptionsGuiOpen = false;
 	public TwineVariables variables;
 
 	void Update ()

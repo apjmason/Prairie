@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SimpleJSON;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -79,22 +80,26 @@ public class TwineJsonParser {
 	/// Turns a JSON-formatted Twine node into a GameObject with all the relevant data in a TwineNode component.
 	/// </summary>
 	/// <returns>GameObject of single node.</returns>
-	/// <param name="storyNode">A Twine Node, in JSON format</param>
-	public static GameObject MakeGameObjectFromStoryNode (JSONNode storyNode)
+	/// <param name="nodeJSON">A Twine Node, in JSON format</param>
+	public static GameObject MakeGameObjectFromStoryNode (JSONNode nodeJSON)
 	{
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 
-		GameObject nodeGameObject = new GameObject(storyNode["name"]);
+		GameObject nodeGameObject = new GameObject(nodeJSON["name"]);
 		nodeGameObject.AddComponent<TwineNode> ();
 
 		// Save additional Twine data on a Twine component
 		TwineNode twineNode = nodeGameObject.GetComponent<TwineNode> ();
-		twineNode.pid = storyNode["pid"];
-		twineNode.name = storyNode["name"];
+		twineNode.pid = nodeJSON["pid"];
+		twineNode.name = nodeJSON["name"];
 
-		twineNode.tags = GetDequotedStringArrayFromJsonArray(storyNode["tags"]);
+		twineNode.tags = GetDequotedStringArrayFromJsonArray(nodeJSON["tags"]);
 
-		twineNode.content = RemoveTwineLinks (storyNode["text"]);
+		twineNode.content = RemoveTwineLinks (nodeJSON["text"]);
+
+        //TODO:  Come up with a better name, and make this actually do something useful
+        string[] variableExpressions = GetVariableExpressions(nodeJSON["text"]);
+        ActivateVariableExpressions(variableExpressions, twineNode);
 
 		// If Start Node, Parse the content and store variables
 		if (twineNode.name.Equals("start")) {
@@ -123,10 +128,75 @@ public class TwineJsonParser {
 
 		return nodeGameObject;
 
-		#endif
-	}
+#endif
+    }
 
-	public static void MatchChildren(Dictionary<string, JSONNode> twineNodesJsonByName, Dictionary<string, GameObject> gameObjectsByName)
+    /// <summary>
+    /// Parses the text of a twine node to find the variable expressions 
+    /// (marked with double parentheses) within
+    /// </summary>
+    /// <param name="text">Node text with all links and variable expressions</param>
+    /// <returns>Variable expressions minus parentheses</returns>
+    public static string[] GetVariableExpressions(string text)
+    {
+        Regex expressionRegex = new Regex("\\(\\([^)]*\\)\\)");
+        MatchCollection matches = expressionRegex.Matches(text);
+        string[] strings = new string[matches.Count];
+        int resultNum = 0;
+        foreach (Match match in matches)
+        {
+            string result = match.Value;
+            strings[resultNum] = result.Substring(2, result.Length - 4);
+            resultNum++;
+        }
+        return strings;
+    }
+
+    //TODO: Finish
+    /// <summary>
+    /// Sets the 
+    /// </summary>
+    /// <param name="expressions">Node's variable expressions</param>
+    /// <param name="node">Twine node</param>
+    /// <returns>True, unless something goes wrong</returns>
+    public static bool ActivateVariableExpressions(string[] expressions, TwineNode node)
+    {
+        Regex variableRegex = new Regex("\\$\\w*");
+        Regex newValueRegex = new Regex(":\\s*(\\w*)");
+        Regex matchValueRegex = new Regex("=\\s*(\\w*)");
+        Regex assignmentRegex = new Regex("\\$\\w*:");
+        Regex linkRegex = new Regex("\\[\\[([^\\]]*)\\]\\]");
+        Regex ifRegex = new Regex("^\\s*if", RegexOptions.IgnoreCase);
+        foreach (string expression in expressions)
+        {
+            node.content += "\n" + expression;
+            if (assignmentRegex.IsMatch(expression))
+            {
+                node.content += "\n (assignment)";
+                string variable = variableRegex.Match(expression).Value;
+                string newValue = newValueRegex.Match(expression).Groups[1].Value;
+                node.content += "\n Set '" + variable + "' to '" + newValue + "'";
+                node.assignments[variable] = newValue;
+            }
+            else if (ifRegex.IsMatch(expression))
+            {
+                node.content += "\n (conditional)";
+                string variable = variableRegex.Match(expression).Value;
+                string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
+                string link = linkRegex.Match(expression).Groups[1].Value;
+                node.content += "\n Proceed to '" + link + "' if '" + variable + "' = '" + matchValue + "'";
+                string[] variableMatch = { variable, matchValue };
+                node.conditionals[link] = variableMatch;
+            }
+            else
+            {
+                node.content += "\n Unknown!";
+            }
+        }
+        return false;
+    }
+
+    public static void MatchChildren(Dictionary<string, JSONNode> twineNodesJsonByName, Dictionary<string, GameObject> gameObjectsByName)
 	{
 		foreach(KeyValuePair<string, GameObject> entry in gameObjectsByName)
 		{
@@ -156,17 +226,17 @@ public class TwineJsonParser {
 			}
 		}
 	}
-		
-	/// <summary>
-	/// Strips the list of children off the content,
-	/// because we really only want the content.
-	/// </summary>
-	/// <returns>The content without children atached.</returns>
-	/// <param name="content">Content with children attached.</param>
-	public static string RemoveTwineLinks (string content)
+
+    //TODO:  Update this.  At present, it just cuts everything off after the first single open bracket.  Bad.
+    /// <summary>
+    /// Returns the text of a node without links or variable expressions
+    /// </summary>
+    /// <returns>The content without children atached.</returns>
+    /// <param name="content">Content with children attached.</param>
+    public static string GetVisibleText (string content)
 	{
-		string[] substrings = content.Split ('[');
-		return substrings[0];
+        Regex invisibleTextRegex = new Regex("(\\[\\[([^\\]]*)\\]\\])|(\\(\\([^)]*\\)\\))");
+        return invisibleTextRegex.Replace(content, "");
 	}
 
 	static string[] GetDequotedStringArrayFromJsonArray (JSONNode jsonNode)
