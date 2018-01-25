@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
+using System;
 using System.Linq;
 
 #if UNITY_EDITOR
@@ -11,6 +12,7 @@ using UnityEditor;
 public class TwineJsonParser {
 
 	public const string PRAIRIE_DECISION_TAG = "prairie_decision";
+	public const string PRAIRIE_CONDITION_TAG = "prairie_condition";
 
 	public static void ImportFromString(string jsonString, string prefabDestinationDirectory)
 	{
@@ -94,9 +96,27 @@ public class TwineJsonParser {
 
 		twineNode.content = RemoveTwineLinks (storyNode["text"]);
 
+		// If Start Node, Parse the content and store variables
+		if (twineNode.name.Equals("start")) {
+			Debug.Log("ADD VAR TO START");
+			string[] raw = twineNode.content.Split(new string[] { "\n" }, StringSplitOptions.None).Reverse().Skip(1).Reverse().ToArray();
+			Debug.Log("ready to init");
+			twineNode.iniVariables(raw);
+
+
+			// foreach (string r in raw) {
+			// 	string ar = r.Replace ("((", string.Empty).Replace ("))", string.Empty);
+			// 	List<string> pair = ar.Split (":").ToList ();
+			// 	twineNode.iniVariables (pair[0], pair[1]);
+			// }
+		}
+
 		// Upon creation of this node, ensure that it is a decision node if it has
 		//	the decision tag:
+		// Vice versa for condition node
 		twineNode.isDecisionNode = (twineNode.tags != null && twineNode.tags.Contains (PRAIRIE_DECISION_TAG));
+		twineNode.isConditionNode = (twineNode.tags != null && twineNode.tags.Contains (PRAIRIE_CONDITION_TAG));
+
 
 		// Start all twine nodes as deactivated at first:
 		twineNode.Deactivate();
