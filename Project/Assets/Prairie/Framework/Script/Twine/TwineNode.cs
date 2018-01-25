@@ -29,10 +29,12 @@ public class TwineNode : MonoBehaviour {
     
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
     public static int visibleNodeIndex = 0;
-    private int index = -1;
-    private static bool fanfold = false;
+    public static int insertIndex = -1;
+    private static bool fanfold = true;
     private static float height = 0;
     private bool heightAdded = false;
+    public static string storyTitle = "";
+    
 
 	void Update ()
 	{
@@ -40,8 +42,24 @@ public class TwineNode : MonoBehaviour {
             if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0){
                 fanfold = !fanfold;
             }
+//            if (visibleNodeIndex == null) {
+//                visibleNodeIndex = 0;
+//            }
+//            print(visibleNodeIndex);
+//            print(TwineNodeList.IndexOf(this));
             if (!TwineNodeList.Contains(this)){
                 TwineNodeList.Add(this);
+//                storyTitle = this.name;
+//                print(this.name);
+//                insertIndex = TwineNodeList.IndexOf(this);
+//                print("printing");
+//                print(TwineNodeList.Count);
+//                    foreach (TwineNode item in TwineNodeList) {
+//                        print(item.name);
+//                    }
+//                    if (TwineNodeList.Count > 1){
+//                        this.isMinimized = true;
+//                    }
                 }
             if (Input.GetKeyDown (KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0){
                 if (visibleNodeIndex == TwineNodeList.Count - 1) {
@@ -57,7 +75,15 @@ public class TwineNode : MonoBehaviour {
             else {
                 this.isMinimized = true;
             }
-
+//            if (Input.GetKeyDown (KeyCode.Alpha0)) {
+//				visibleNodeIndex = 0;
+//			}
+//            if (Input.GetKeyDown (KeyCode.Alpha1)) {
+//				visibleNodeIndex = 1;
+//			}
+//			if (Input.GetKeyDown (KeyCode.Q) {
+//				this.isMinimized = ;
+//			}
 
 			if (this.isDecisionNode) {
 				if (this.isOptionsGuiOpen && Input.GetKeyDown (KeyCode.Tab)) {
@@ -84,13 +110,16 @@ public class TwineNode : MonoBehaviour {
         if (fanfold) {
             float frameWidth = Math.Min(Screen.width / 3, 150);
             float frameHeight = Math.Min(Screen.height / 2, 500);
-            index = TwineNodeList.IndexOf(this);
+//            height += frameHeight/10;
+//            this.heightAdded = true;
+            int index = TwineNodeList.IndexOf(this);
             Rect frame = new Rect (10+index*150, 10, frameWidth, frameHeight);
             GUI.BeginGroup (frame);
 			GUIStyle style = new GUIStyle (GUI.skin.box);
 			style.wordWrap = true;
 			style.fixedWidth = frameWidth;
 			GUILayout.Box (this.content, style);
+//            print(height);
 
 			if (isDecisionNode) {
 				GUIStyle decisionHintStyle = new GUIStyle (style);
@@ -190,12 +219,15 @@ public class TwineNode : MonoBehaviour {
 	/// <param name="interactor">The interactor.</param>
 	public bool Activate(GameObject interactor)
 	{
+//        print(TwineNodeList);
 		if (!this.enabled && this.HasActiveParentNode()) 
 		{
 			this.enabled = true;
 			this.isMinimized = false;
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
+            TwineNodeList.Insert(insertIndex,this);
+//            TwineNodeList.Add(this);
             visibleNodeIndex = TwineNodeList.IndexOf(this);
 			this.StartInteractions (interactor);
 
@@ -227,8 +259,16 @@ public class TwineNode : MonoBehaviour {
 	public void Deactivate() 
 	{
 		this.enabled = false;
+        insertIndex = TwineNodeList.IndexOf(this);
+//        print(insertIndex);
         TwineNodeList.Remove(this);
+//        print("deactivate" + TwineNodeList.Count);
 	}
+
+//    public void AddToList()
+//    {
+//        TwineNodeList.Add(this);
+//    }
 
 	/// <summary>
 	/// Check if this Twine Node has an active parent node.
