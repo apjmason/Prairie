@@ -95,7 +95,7 @@ public class TwineJsonParser {
 
 		twineNode.tags = GetDequotedStringArrayFromJsonArray(nodeJSON["tags"]);
 
-		twineNode.content = RemoveTwineLinks (nodeJSON["text"]);
+		twineNode.content = GetVisibleText (nodeJSON["text"]);
 
         //TODO:  Come up with a better name, and make this actually do something useful
         string[] variableExpressions = GetVariableExpressions(nodeJSON["text"]);
@@ -169,24 +169,24 @@ public class TwineJsonParser {
         Regex ifRegex = new Regex("^\\s*if", RegexOptions.IgnoreCase);
         foreach (string expression in expressions)
         {
-            node.content += "\n" + expression;
+            // node.content += "\n" + expression;
             if (assignmentRegex.IsMatch(expression))
             {
-                node.content += "\n (assignment)";
+                // node.content += "\n (assignment)";
                 string variable = variableRegex.Match(expression).Value;
                 string newValue = newValueRegex.Match(expression).Groups[1].Value;
-                node.content += "\n Set '" + variable + "' to '" + newValue + "'";
-                node.assignments[variable] = newValue;
+                // node.content += "\n Set '" + variable + "' to '" + newValue + "'";
+                node.iniAssignments(variable, newValue);
             }
             else if (ifRegex.IsMatch(expression))
             {
-                node.content += "\n (conditional)";
+                // node.content += "\n (conditional)";
                 string variable = variableRegex.Match(expression).Value;
                 string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
                 string link = linkRegex.Match(expression).Groups[1].Value;
-                node.content += "\n Proceed to '" + link + "' if '" + variable + "' = '" + matchValue + "'";
+                // node.content += "\n Proceed to '" + link + "' if '" + variable + "' = '" + matchValue + "'";
                 string[] variableMatch = { variable, matchValue };
-                node.conditionals[link] = variableMatch;
+                node.iniConditionals(link, variableMatch);
             }
             else
             {

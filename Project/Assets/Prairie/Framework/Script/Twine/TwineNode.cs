@@ -13,8 +13,6 @@ public class TwineNode : MonoBehaviour {
 	[HideInInspector]
 	public string pid;
 	public new string name;
-	public Dictionary<string, string> assignments = new Dictionary<string, string>();
-	public Dictionary<string, string> conditionals = new Dictionary<string, string>();
 	[HideInInspector]
 	public string[] tags;
 	public string content;
@@ -26,10 +24,10 @@ public class TwineNode : MonoBehaviour {
 	public bool isDecisionNode;
 	public bool isConditionNode;
 
-  public Dictionary<string, string> assignments = new Dictionary<string, string>();
-  public Dictionary<string, string[]> conditionals = new Dictionary<string, string[]>();
+  	public Dictionary<string, string> assignments;
+  	public Dictionary<string, string[]> conditionals;
 
-  private bool isMinimized = false;
+  	private bool isMinimized = false;
 	private bool isOptionsGuiOpen = false;
 	public TwineVariables variables;
 
@@ -138,7 +136,7 @@ public class TwineNode : MonoBehaviour {
 		{
 			this.enabled = true;
 			this.isMinimized = false;
-			// this.ParseContent();
+			this.TakeAction();
 			this.isOptionsGuiOpen = false;
 			this.DeactivateAllParents ();
 			this.StartInteractions (interactor);
@@ -203,18 +201,18 @@ public class TwineNode : MonoBehaviour {
 
 
 	/// <summary>
-	/// Parse the content of the node and make according actions
+	/// Read the content of the node and make according actions
 	/// </summary>
-	private void ParseContent()
-	{	
-		// if (this.assignments.Count != 0) {
-		// 	List<string> keyList = new List<string>(this.variables.Keys);
-		// 	foreach (string v in keyList) {
-		// 		if (this.assignments.ContainsKey(v)) {
-		// 			variables [v] = assignments[v];
-		// 		}
-		// 	}
-		// } else if (this.conditionals.Count != 0) {
+	private void TakeAction() {	
+		if (this.assignments.Count != 0) {
+			List<string> keyList = new List<string>(this.assignments.Keys);
+			foreach (string v in keyList) {
+				this.variables.AssignValue(v, assignments[v]);
+				Debug.Log("Assign: " + "var-" + v + " val-" + assignments[v]);
+			}
+		}
+
+		// else if (this.conditionals.Count != 0) {
 		// 	List<string[]> ifList = new List<string[]> (this.dicIf.Keys);
 		// 	foreach (string[] i in ifList) {
 		// 		if (string.Equals(variables [i[0]], i[1])) {
@@ -231,5 +229,17 @@ public class TwineNode : MonoBehaviour {
 
 	public void iniVariables(string[] vars){
 		TwineVariables.GetTwineVariables(vars);
+	}
+
+	public void iniAssignments(string var, string value) {
+		Debug.Log("iniAssignments");
+		this.assignments = new Dictionary<string, string>();
+		this.assignments[var] = value;
+	}
+
+	public void iniConditionals(string link, string[] varMatch){
+		Debug.Log("iniConditionals");
+		this.conditionals = new Dictionary<string, string[]>();
+		this.conditionals[link] = varMatch;
 	}
 }

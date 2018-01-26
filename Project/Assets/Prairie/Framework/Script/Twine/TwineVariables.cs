@@ -12,7 +12,7 @@ public class TwineVariables {
 	private TwineVariables(string[] vars) {
 
 		this.diction = new Dictionary<string, string>();
-		this.diction ["color"] = "red";
+		this.diction ["color"] = "white";
 
 //		foreach (string r in vars) {
 //			string ar = r.Replace ("((", string.Empty).Replace ("))", string.Empty);
@@ -23,6 +23,11 @@ public class TwineVariables {
 
 	public Dictionary<string, string> Variables(){
 		return diction;
+	}
+
+	public void AssignValue(string var, string val){
+		// TODO: check if there is a var, if not, automatically create one
+		this.diction[var] = val;
 	}
 
 
