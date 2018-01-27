@@ -9,6 +9,7 @@ public class JournalGui : MonoBehaviour {
 
 	public Transform contentPanel;
 	public GameObject prefab;
+	public FirstPersonInteractor FPI;
 
 	// Name of the journal object in game scene.
 	private const string JOURNAL = "Journal";
@@ -23,15 +24,16 @@ public class JournalGui : MonoBehaviour {
 			if (!isJournalOpen) {
 				isJournalOpen = true;
 				openJournal ();
-				Time.timeScale = 0;
-				Cursor.visible = true;
-				Cursor.lockState = CursorLockMode.None;
+				FPI.setWorldActive ("Journal");
+				//timescale change here also
+				//Cursor.visible = true;
+				//Cursor.lockState = CursorLockMode.None;
 			} else {
 				isJournalOpen = false;
 				closeJournal ();
-				Time.timeScale = 1;
-				Cursor.visible = false;
-				Cursor.lockState = CursorLockMode.Locked;
+				FPI.setWorldActive ("Journal");
+				//Cursor.visible = false;
+				//Cursor.lockState = CursorLockMode.Locked;
 			}
 				
 		}
