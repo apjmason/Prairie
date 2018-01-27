@@ -37,6 +37,7 @@ public class JournalTitleGuiButton : MonoBehaviour
 	private void DisplayName(JournalEntry e) {
 		Text name = GameObject.Find(NAME).GetComponentInChildren<Text>();
 		name.text = entry.title;
+		name.color = Color.white;
 	}
 
 	private void DisplayInfo(JournalEntry e) {
@@ -46,5 +47,6 @@ public class JournalTitleGuiButton : MonoBehaviour
 			info.text += c;
 			info.text += '\n';
 		}
+		info.color = Color.white;
 	}
 }
