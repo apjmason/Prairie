@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class JournalGui : MonoBehaviour {
@@ -25,20 +26,13 @@ public class JournalGui : MonoBehaviour {
 				isJournalOpen = true;
 				openJournal ();
 				FPI.setWorldActive ("Journal");
-				//timescale change here also
-				//Cursor.visible = true;
-				//Cursor.lockState = CursorLockMode.None;
 			} else {
 				isJournalOpen = false;
 				closeJournal ();
 				FPI.setWorldActive ("Journal");
-				//Cursor.visible = false;
-				//Cursor.lockState = CursorLockMode.Locked;
 			}
-				
 		}
 	}
-
 
 	public void openJournal(){
 		AddButtons ();

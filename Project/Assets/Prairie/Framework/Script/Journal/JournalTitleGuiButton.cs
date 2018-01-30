@@ -25,18 +25,19 @@ public class JournalTitleGuiButton : MonoBehaviour
 	{
 		entry = currentEntry;
 		title.text = entry.title;
+		fitTextToButton ();
 	}
 
 	public void HandleClick() 
 	{
 		DisplayName (entry);
 		DisplayInfo (entry);
-//		DisplayImage (entry);
 	}
 
 	private void DisplayName(JournalEntry e) {
 		Text name = GameObject.Find(NAME).GetComponentInChildren<Text>();
 		name.text = entry.title;
+		name.color = Color.white;
 	}
 
 	private void DisplayInfo(JournalEntry e) {
@@ -45,6 +46,23 @@ public class JournalTitleGuiButton : MonoBehaviour
 		foreach (string c in e.content) {
 			info.text += c;
 			info.text += '\n';
+		}
+		info.color = Color.white;
+	}
+
+	private void fitTextToButton() {
+		double textWidth = title.preferredWidth; // This is the width the text would LIKE to be.
+		double parentWidth = GetComponent<LayoutElement>().preferredWidth * 0.9; // This is the width that we want the text to be contained in.
+																				// Anchor set to 0.05~0.95 for text
+		double scale = parentWidth / textWidth;
+
+		// Construct new title for overflowed string
+		if (scale < 1) {
+			int sublength = (int)(title.text.Length * scale - 3);
+			if (sublength < 0) {
+				sublength = 0;
+			}
+			title.text = (title.text.Substring (0, sublength) + "...");
 		}
 	}
 }
