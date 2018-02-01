@@ -35,18 +35,35 @@ public class TwineNode : MonoBehaviour {
     
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
     public static int visibleNodeIndex = 0;
-    public static int insertIndex = -1;
+    public int insertIndex = -1;
     private static bool fanfold = true;
     private static float height = 0;
     private bool heightAdded = false;
     public static string storyTitle = "";
+    public static bool allMinimized = false;
 
+
+    void Start()
+    {
+        StartCoroutine(Example());
+    }
+
+    IEnumerator Example()
+    {
+        if (this.children.Length == 0) {
+            yield return new WaitForSeconds(5);
+            this.Deactivate();
+        }
+    }
 
 	void Update ()
 	{
 		if (this.enabled) {
             if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0){
                 fanfold = !fanfold;
+            }
+            if (Input.GetKeyDown (KeyCode.M) && TwineNodeList.IndexOf(this) == 0){
+                allMinimized = !allMinimized;
             }
 //            if (visibleNodeIndex == null) {
 //                visibleNodeIndex = 0;
@@ -106,7 +123,7 @@ public class TwineNode : MonoBehaviour {
 
 	public void OnGUI()
 	{
-        if (fanfold) {
+        if ((fanfold) && (allMinimized == false)) {
             float frameWidth = Math.Min(Screen.width / 3, 150);
             float frameHeight = Math.Min(Screen.height / 2, 500);
 //            height += frameHeight/10;
@@ -148,7 +165,7 @@ public class TwineNode : MonoBehaviour {
 			GUI.EndGroup ();
             
         }
-        else if (this.enabled && !this.isMinimized) {
+        else if (this.enabled && !this.isMinimized && !allMinimized) {
             float frameWidth = Math.Min(Screen.width / 3, 350);
             float frameHeight = Math.Min(Screen.height / 2, 500);
             Rect frame = new Rect (10, 10, frameWidth, frameHeight);
@@ -223,12 +240,19 @@ public class TwineNode : MonoBehaviour {
 		{
 			this.enabled = true;
 			this.isMinimized = false;
-			this.TakeAction();
+//			this.TakeAction();
 			this.isOptionsGuiOpen = false;
-			this.DeactivateAllParents ();
+            foreach (GameObject parent in parents) {
+                TwineNode node = parent.GetComponent<TwineNode> ();
+                if (node.enabled) {
+                    insertIndex = TwineNodeList.IndexOf(node);
+                    node.Deactivate ();
+                }
+            }
             TwineNodeList.Insert(insertIndex,this);
 //            TwineNodeList.Add(this);
             visibleNodeIndex = TwineNodeList.IndexOf(this);
+            
 			this.StartInteractions (interactor);
 
 			return true;
@@ -259,7 +283,6 @@ public class TwineNode : MonoBehaviour {
 	public void Deactivate() 
 	{
 		this.enabled = false;
-        insertIndex = TwineNodeList.IndexOf(this);
 //        print(insertIndex);
         TwineNodeList.Remove(this);
 //        print("deactivate" + TwineNodeList.Count);
@@ -290,13 +313,13 @@ public class TwineNode : MonoBehaviour {
 	/// <summary>
 	/// Deactivate all parents of this Twine Node.
 	/// </summary>
-	private void DeactivateAllParents()
-	{
-		foreach (GameObject parent in parents) 
-		{
-			parent.GetComponent<TwineNode> ().Deactivate ();
-		}
-	}
+//	private void DeactivateAllParents()
+//	{
+//		foreach (GameObject parent in parents) 
+//		{
+//			parent.GetComponent<TwineNode> ().Deactivate ();
+//		}
+//	}
 
 
 	/// <summary>
