@@ -24,6 +24,7 @@ public class FirstPersonInteractor : MonoBehaviour
 	public bool startMenuOpen = false;
 	public bool journalOpen = false;
 	public bool inventoryAccess = false;
+    public int dialogue = 0;
 
 	// Control-related
 
@@ -161,7 +162,16 @@ public class FirstPersonInteractor : MonoBehaviour
 			}
 		}
 
-		if (!startMenuOpen && !journalOpen && !inventoryAccess) {
+        if (pauseType == "DialogueOpen")
+        {
+            dialogue += 1;
+        }
+        if (pauseType == "DialogueClose")
+        {
+            dialogue -= 1;
+        }
+
+        if (!startMenuOpen && !journalOpen && !inventoryAccess && dialogue == 0) {
 			Time.timeScale = 1;
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Locked;
