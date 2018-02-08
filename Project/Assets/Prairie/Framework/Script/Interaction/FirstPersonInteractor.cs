@@ -128,7 +128,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 		
 		// draw toolbar with our set of accessable area annotations
-		this.drawToolbar(this.areaAnnotationsInRange);
+//		this.drawToolbar(this.areaAnnotationsInRange);
 	}
 
 	private void drawCrosshair()
