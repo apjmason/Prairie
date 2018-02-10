@@ -145,11 +145,23 @@ public class TwineJsonParser
     /// <returns>True, unless something goes wrong</returns>
     public static bool ActivateVariableExpressions(string[] expressions, TwineNode node)
     {
+        // Matches an alphanumeric string preceded by a dollar sign
+        //   e.g. "$var" or "$1Apple3" but not "$.var" or "$app le"
         Regex variableRegex = new Regex("\\$\\w*");
-        Regex newValueRegex = new Regex(":\\s*(\\w*)");
+        // Finds an instance of a variable being assigned, starting with the 
+        //   ":" and including the assigned alphanumeric value in a sub-group.
+        //   e.g. ": red" and "red"; ":      3" and "3"
+        Regex assignmentRegex = new Regex(":\\s*(\\w*)");
+        // Like the previous, but detects a value being compared to a value 
+        //   with an equals sign rather than assignments.
+        //   e.g. "= red" and "red"
         Regex matchValueRegex = new Regex("=\\s*(\\w*)");
-        Regex assignmentRegex = new Regex("\\$\\w*:");
+        // Finds a twine link - i.e. a double-bracketed line of text - with the
+        //   link content in a sub-group
+        //   e.g. "[[Next Node]]" and "Next Node"
         Regex linkRegex = new Regex("\\[\\[([^\\]]*)\\]\\]");
+        // Finds a conditional variable line by looking for the string "if"
+        //   (not case sensitive)
         Regex ifRegex = new Regex("^\\s*if", RegexOptions.IgnoreCase);
 
         Debug.Log("Going through variable expressions...");
@@ -159,7 +171,7 @@ public class TwineJsonParser
             if (assignmentRegex.IsMatch(expression))
             {
                 string variable = variableRegex.Match(expression).Value;
-                string newValue = newValueRegex.Match(expression).Groups[1].Value;
+                string newValue = assignmentRegex.Match(expression).Groups[1].Value;
                 node.AddAssignment(variable, newValue);
                 Debug.Log("Adding assignment...");
             }
@@ -169,10 +181,11 @@ public class TwineJsonParser
                 string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
                 string link = linkRegex.Match(expression).Groups[1].Value;
                 node.AddConditional(variable, matchValue, link);
+                Debug.Log("Adding conditional...");
             }
             else
             {
-                node.content += "\n Unknown variable expression!";
+                Debug.Log("Unknown variable expression!");
             }
         }
         return false;
@@ -217,6 +230,8 @@ public class TwineJsonParser
     /// <param name="content">Content with children attached.</param>
     public static string GetVisibleText(string content)
     {
+        // Pattern for text surrounded by double parentheses or double brackets
+        //  e.g. "[[text blah blay asdlh]]" or "((asddflhjwherkkh}}"
         Regex invisibleTextRegex = new Regex("(\\[\\[([^\\]]*)\\]\\])|(\\(\\([^)]*\\)\\))");
         return invisibleTextRegex.Replace(content, "");
     }
