@@ -12,7 +12,7 @@ public class AreaAnnotationGui : MonoBehaviour
 	public FirstPersonInteractor FPI;
 
 	// Name of the areaAnnotationGUI object in game scene.
-	private const string AREAANNOTATION = "AnnotationPanel";
+	private const string AREAANNOTATION = "AreaAnnotationPanel";
 
 	void Start() {
 		gameObject.transform.Find(AREAANNOTATION).gameObject.SetActive (active);
