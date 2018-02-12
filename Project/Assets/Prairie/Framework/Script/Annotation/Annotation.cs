@@ -263,7 +263,7 @@ public class Annotation : Interaction
 			if (!aag.isUIActive ()) {
 				aag.ActivateGui ();
 			}
-			aag.AddAnnotationEntry (interactor.areaAnnotationsInRange);
+			aag.AddAnnotationEntry (this);
 
 
 			// Add area annotation log to journal
@@ -289,10 +289,11 @@ public class Annotation : Interaction
 		}
 		else
 		{
+			// Remove annotation entry from the toolbox on the lower left corner.
+			interactor.GetComponentInChildren<AreaAnnotationGui> ().RemoveAnnotationEntry (this);
+
 			interactor.areaAnnotationsInRange.Remove(this);
 
-			// Remove annotation entry from the toolbox on the lower left corner.
-			interactor.GetComponentInChildren<AreaAnnotationGui> ().RemoveAnnotationEntry (interactor.areaAnnotationsInRange);
 			if (interactor.areaAnnotationsInRange.Count == 0) {
 				interactor.GetComponentInChildren<AreaAnnotationGui> ().DeactivateGui ();
 			}
