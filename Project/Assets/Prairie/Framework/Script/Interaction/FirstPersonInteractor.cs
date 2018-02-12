@@ -126,9 +126,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			// draw a crosshair when we have no highlighted object
 			this.drawCrosshair();
 		}
-		
-		// draw toolbar with our set of accessable area annotations
-//		this.drawToolbar(this.areaAnnotationsInRange);
 	}
 
 	private void drawCrosshair()
@@ -171,47 +168,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			Cursor.lockState = CursorLockMode.None;
 		}
 
-	}
-
-	// Draw the Area Annotation box in the game (lower left corner)
-	private void drawToolbar(List<Annotation> annotations)
-	{
-		if (annotations.Count != 0 && this.annotationsEnabled)
-		{
-			float xMargin = 10f;
-			float yMargin = 10f;
-			float rowSize = 35f;
-
-			float toolbarWidth = Mathf.Min (0.25f * Screen.width, 500f);
-			float toolbarHeight = (annotations.Count + 1) * rowSize;	// first row is a label
-
-			// GUI coordinate system places 0,0 in top left corner
-			float currentX = xMargin;
-			float currentY = Screen.height - (yMargin + toolbarHeight);
-
-			// Make a background box
-			Rect toolbarFrame = new Rect (currentX, currentY, toolbarWidth, toolbarHeight);
-			GUI.Box(toolbarFrame, "Area Annotations");
-			
-			// Shift down and indent 
-			currentX += 10f;
-			currentY += rowSize;
-
-			// Make list of buttons, paired with annotation summaries
-			int buttonIndex = 1;
-			foreach (Annotation a in annotations)
-			{
-				float rowHeight = 0.6f*rowSize;
-				Rect buttonFrame = new Rect (currentX, currentY, 20, 20);
-				Rect labelFrame = new Rect (currentX + 30, currentY, toolbarWidth, rowHeight);
-
-				GUI.Button (buttonFrame, buttonIndex.ToString());
-				GUI.Label (labelFrame, a.summary);
-
-				currentY += rowSize;
-				buttonIndex++;
-			}
-		}
 	}
 
 	/// --- Trigger Areas ---
