@@ -39,6 +39,7 @@ public class AreaAnnotationGui : MonoBehaviour
 		List<Annotation> annotations = FPI.areaAnnotationsInRange;
 		GameObject newStoryEntry;
 
+		Debug.Log ("Add annotation " + a.summary);
 		// Instantiate a new prefab if not enough entries have been created before.
 		newStoryEntry = (GameObject)GameObject.Instantiate (prefab);
 		newStoryEntry.transform.SetParent (contentPanel);
@@ -52,18 +53,18 @@ public class AreaAnnotationGui : MonoBehaviour
 
 		// Update the content in the prefab. (<Text>[0]: button text, <Text>[1]: content text)
 		newStoryEntry.GetComponentsInChildren<Text> ()[1].text = a.summary;
+
+		a.areaAnnotationUIEntry = newStoryEntry;
 	}
 
 	// Remove the last entry when out of range.
-	public void RemoveAnnotationEntry(Annotation aToRemove) {
-		int indexToRemove = FPI.areaAnnotationsInRange.IndexOf(aToRemove);
-
-		// Update all the keyDowns after the to-be-removed annotation entry.
-		updateButtonIndicesOnRemove(indexToRemove);
-
+	public void RemoveAnnotationEntry(Annotation removed) {
+		Debug.Log ("Remove annotation " + removed.summary);
 		// Destory the UI prefab associated with the removed annotation.
-		GameObject entryToRemove = contentPanel.transform.GetChild (indexToRemove).gameObject;
-		Destroy(entryToRemove);
+		Destroy(removed.areaAnnotationUIEntry);
+
+		// Update all the keyDowns on removal.
+		updateButtonIndicesOnRemove();
 	}
 
 	private void fitPrefabToParentSize(GameObject storyEntry) {
@@ -79,10 +80,10 @@ public class AreaAnnotationGui : MonoBehaviour
 		storyEntry.transform.localScale = new Vector3 (scale, scale, scale);
 	}
 
-	private void updateButtonIndicesOnRemove(int indexToRemove) {
-		for (int i = indexToRemove + 1; i < FPI.areaAnnotationsInRange.Count; i++) {
-			Button b = contentPanel.transform.GetChild(i).gameObject.GetComponentInChildren<Button> ();
-			b.GetComponentInChildren<Text> ().text = i.ToString ();
+	private void updateButtonIndicesOnRemove() {
+		for (int i = 0; i < FPI.areaAnnotationsInRange.Count; i++) {
+			Button b = FPI.areaAnnotationsInRange[i].areaAnnotationUIEntry.GetComponentInChildren<Button> ();
+			b.GetComponentInChildren<Text> ().text = (i+1).ToString ();
 		}
 	}
 }

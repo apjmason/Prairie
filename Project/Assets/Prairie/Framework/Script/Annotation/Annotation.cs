@@ -39,6 +39,9 @@ public class Annotation : Interaction
     public List<Texture2D> images;
     public string summary = "";
 
+	// The UI element representing an entry in area annotation toolbox
+	public GameObject areaAnnotationUIEntry;
+
 	// Journal option
 	public bool addToJournal = true;
 
@@ -265,7 +268,6 @@ public class Annotation : Interaction
 			}
 			aag.AddAnnotationEntry (this);
 
-
 			// Add area annotation log to journal
 			if (addToJournal) {
 				interactor.GetComponentInChildren<Journal> ().AddToJournal (this);
@@ -289,10 +291,10 @@ public class Annotation : Interaction
 		}
 		else
 		{
+			interactor.areaAnnotationsInRange.Remove(this);
+
 			// Remove annotation entry from the toolbox on the lower left corner.
 			interactor.GetComponentInChildren<AreaAnnotationGui> ().RemoveAnnotationEntry (this);
-
-			interactor.areaAnnotationsInRange.Remove(this);
 
 			if (interactor.areaAnnotationsInRange.Count == 0) {
 				interactor.GetComponentInChildren<AreaAnnotationGui> ().DeactivateGui ();
