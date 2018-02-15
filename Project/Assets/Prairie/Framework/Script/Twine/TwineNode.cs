@@ -32,7 +32,7 @@ public class TwineNode : MonoBehaviour
     public List<string> conditionalVars;
     public List<string> conditionalVals;
     public List<string> conditionalLinks;
-    public List<string> conditionalMatch;
+    public List<string> conditionalOp;
 
     public TwineVariables globalVariables;
 
@@ -323,27 +323,27 @@ public class TwineNode : MonoBehaviour
     /// </summary>
     private void RunVariableAssignments()
     {
-        if (globalVariables == null)
-        {
-            globalVariables = TwineVariables.GetVariableObject();
-        }
         if (assignmentVars != null)
-        {   
-
-            string plusSign = "+";
-            string minusSign = "-";
+        {
+            if (globalVariables == null)
+            {
+                globalVariables = TwineVariables.GetVariableObject();
+            }
+            //string plusSign = "+";
+            //string minusSign = "-";
 
             for (int i = 0; i < assignmentVars.Count; i++)
             {
                 string varName = assignmentVars[i];
                 string varValue = assignmentVals[i];
-                if (varValue.Contains(plusSign) || varValue.Contains(minusSign))
-                {
-                    globalVariables.AssignValueArithmetic(varName, Int32.Parse(varValue));
-                } else
-                {
-                    globalVariables.AssignValue(varName, varValue);
-                }
+                globalVariables.AssignValue(varName, varValue);
+                //if (varValue.Contains(plusSign) || varValue.Contains(minusSign))
+                //{
+                //    globalVariables.AssignValueArithmetic(varName, Int32.Parse(varValue));
+                //} else
+                //{
+                //    globalVariables.AssignValue(varName, varValue);
+                //}
             }
         }
     }
@@ -368,21 +368,34 @@ public class TwineNode : MonoBehaviour
                 {
                     checkedChildNames.Add(linkNames[index]);
                     checkedChildren.Add(children[index]);
-                } else
+                }
+                else
                 {
                     string linkName = linkNames[index];
                     int condIndex = conditionalLinks.IndexOf(linkName);
                     string varName = conditionalVars[condIndex];
-                    bool match = conditionalMatch[condIndex]
-                    bool checkMatch;
-                    if (match) 
+                    // Operation of the condition - e.g. "=", "!="
+                    string operation = conditionalOp[condIndex];
+                    // Truth value of the conditional
+                    bool conditionMet;
+                    if (operation == "=") 
                     {
-                        checkMatch = globalVariables.GetValue(varName) == conditionalVals[condIndex]
-                    } else
-                    {
-                        checkMatch = !(globalVariables.GetValue(varName) == conditionalVals[condIndex])
+                        conditionMet = globalVariables.GetValue(varName) == conditionalVals[condIndex];
                     }
-                    if (checkMatch)
+                    else if (operation == "!=")
+                    {
+                        conditionMet = !(globalVariables.GetValue(varName) == conditionalVals[condIndex]);
+                    }
+                    else
+                    {
+                        conditionMet = false;
+                        Exception e = new Exception("Twine conditional has unknown operation");
+                        throw e;
+                    }
+                    //Debug.Log("Operation is " + operation);
+                    //Debug.Log(globalVariables.GetValue(varName));
+                    //Debug.Log(conditionalVals[condIndex]);
+                    if (conditionMet)
                     {
                         checkedChildNames.Add(linkNames[index]);
                         checkedChildren.Add(children[index]);
@@ -409,7 +422,7 @@ public class TwineNode : MonoBehaviour
         assignmentVals.Add(value);
     }
 
-    public void AddConditional(string var, string value, string link, bool match)
+    public void AddConditional(string var, string value, string link, string match)
     {
         Debug.Log("Add conditional");
         if (conditionalVars == null)
@@ -417,11 +430,11 @@ public class TwineNode : MonoBehaviour
             conditionalVars = new List<string>();
             conditionalVals = new List<string>();
             conditionalLinks = new List<string>();
-            conditionalMatch = new List<string>();
+            conditionalOp = new List<string>();
         }
         conditionalVars.Add(var);
         conditionalVals.Add(value);
         conditionalLinks.Add(link);
-        conditionalMatch.Add(match);
+        conditionalOp.Add(match);
     }
 }

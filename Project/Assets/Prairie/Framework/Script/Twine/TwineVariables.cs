@@ -30,23 +30,28 @@ public class TwineVariables
 
     public void AssignValue(string var, string val)
     {
-        // TODO: check if there is a var, if not, automatically create one
         this.diction[var] = val;
     }
 
-    public void AssignValueArithmetic(string var, int val)
-    {
-        this.diction[var] += val;
-    }
+    //public void AssignValueArithmetic(string var, int val)
+    //{
+    //    if (this.diction[var] == null)
+    //    {
+    //        this.diction[var] = val;
+    //    }
+    //    this.diction[var] += val;
+    //}
 
     public string GetValue(string var)
     {
         if (diction.ContainsKey(var))
         {
             return diction[var];
-        } else
+        }
+        else
         {
-            return "asdfkajsdfljasf";
+            // TODO: Discuss the best way to handle this situation
+            return null;
         }
     }
 

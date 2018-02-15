@@ -62,6 +62,7 @@ public class TwineJsonParser
             {
                 // Enable/activate the start node in the story:
                 twineNodeObject.GetComponent<TwineNode>().enabled = true;
+                // TODO: Come up with a way to actually activate the first freaking node.  Setting "enabled" isn't nearly enough!
             }
         }
 
@@ -148,48 +149,50 @@ public class TwineJsonParser
         // Matches an alphanumeric string preceded by a dollar sign
         //   e.g. "$var" or "$1Apple3" but not "$.var" or "$app le"
         Regex variableRegex = new Regex("\\$\\w*");
+
         // Finds an instance of a variable being assigned, starting with the 
         //   ":" and including the assigned alphanumeric value in a sub-group.
         //   e.g. ": red" and "red"; ":      3" and "3"
         Regex assignmentRegex = new Regex(":\\s*(\\w*)");
+
         // Like the previous, but detects a value being compared to a value 
-        //   with an equals sign rather than assignments.
-        //   e.g. "= red" and "red"
-        Regex matchValueRegex = new Regex("=\\s*(\\w*)");
+        //   with an equals sign rather than assignments.  Also gets comparison
+        //   type.
+        //   e.g. "= red" and "=", "red"; "!= 3" and "!=", "3"
+        Regex matchValueRegex = new Regex("(!?=)\\s*(\\w*)");
+
         // Finds a twine link - i.e. a double-bracketed line of text - with the
         //   link content in a sub-group
         //   e.g. "[[Next Node]]" and "Next Node"
         Regex linkRegex = new Regex("\\[\\[([^\\]]*)\\]\\]");
-        // Finds a conditional variable line by looking for the string "if"
-        //   (not case sensitive)
+
+        // Finds all variable lines that start with "if", ignoring case
         Regex ifRegex = new Regex("^\\s*if", RegexOptions.IgnoreCase);
 
         Debug.Log("Going through variable expressions...");
         foreach (string expression in expressions)
         {
-            Debug.Log("Analyzing var exp...");
+            Debug.Log("Analyzing var expression...");
             if (assignmentRegex.IsMatch(expression))
             {
                 string variable = variableRegex.Match(expression).Value;
                 string newValue = assignmentRegex.Match(expression).Groups[1].Value;
                 node.AddAssignment(variable, newValue);
                 Debug.Log("Adding assignment...");
+                Debug.Log("Assignment value = " + newValue);
             }
+            // This condition covers both types of "if" statement.  
+            // We should probably later extend it to cover <, >, <=, and >=,
+            // if we decide to implement them.
             else if (ifRegex.IsMatch(expression))
             {
-                string variable = variableRegex.Match(expression).Value;
-                string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
-                string link = linkRegex.Match(expression).Groups[1].Value;
-                node.AddConditional(variable, matchValue, link, true);
                 Debug.Log("Adding conditional...");
-            }
-            else if (ifnotRegex.IsMatch(expression))
-            {
                 string variable = variableRegex.Match(expression).Value;
-                string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
+                string operation = matchValueRegex.Match(expression).Groups[1].Value;
+                Debug.Log("Operation: " + operation);
+                string matchValue = matchValueRegex.Match(expression).Groups[2].Value;
                 string link = linkRegex.Match(expression).Groups[1].Value;
-                node.AddConditional(variable, matchValue, link, false);
-                Debug.Log("Adding not conditional...");
+                node.AddConditional(variable, matchValue, link, operation);
             }
             else
             {
