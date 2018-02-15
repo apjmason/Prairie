@@ -52,9 +52,9 @@ public class JournalTitleGuiButton : MonoBehaviour
 
 	private void fitTextToButton() {
 		double textWidth = title.preferredWidth; // This is the width the text would LIKE to be.
-		double parentWidth = GetComponent<LayoutElement>().preferredWidth * 0.9; // This is the width that we want the text to be contained in.
+		double buttonWidth = GetComponent<LayoutElement>().preferredWidth * 0.9; // This is the width that we want the text to be contained in.
 																				// Anchor set to 0.05~0.95 for text
-		double scale = parentWidth / textWidth;
+		double scale = buttonWidth / textWidth;
 
 		// Construct new title for overflowed string
 		if (scale < 1) {

@@ -12,8 +12,11 @@ public class JournalGui : MonoBehaviour {
 	public GameObject prefab;
 	public FirstPersonInteractor FPI;
 
-	// Name of the journal object in game scene.
+	// Name of the journal UI object in game scene.
 	private const string JOURNAL = "Journal";
+	// Name of the entry panel UI object in game scene.
+	private const string ENTRYPANEL = "EntryPanel";
+
 
 	void Start() {
 		gameObject.transform.Find(JOURNAL).gameObject.SetActive (active);
@@ -57,10 +60,26 @@ public class JournalGui : MonoBehaviour {
 
 			newButton.transform.SetParent(contentPanel);
 
+			// Scale the button.
+			fitPrefabToParentSize(newButton);
+
 			JournalTitleGuiButton jtgb = newButton.GetComponent<JournalTitleGuiButton>();
 			jtgb.Setup(e);
 
 			startingEntry += 1;
 		}
+	}
+
+	private void fitPrefabToParentSize(GameObject button) {
+		double actualWidth = gameObject.transform.Find(JOURNAL).gameObject.transform.Find(ENTRYPANEL).GetComponent<RectTransform> ().rect.width; // This is the actual width we want to prefab to be after scaling.
+		float originalWidth = button.GetComponent<LayoutElement>().preferredWidth; // This is the preset preferred width of the prefab.
+
+		// Constrain the prefab width to its parent panel.
+		RectTransform rt = button.transform.GetComponent<RectTransform> ();
+		rt.sizeDelta = new Vector2((float)actualWidth, rt.rect.height);
+
+		// Scale the content within the prefab.
+		float scale = (float)actualWidth / (float)originalWidth;
+		button.transform.localScale = new Vector3 (scale, scale, scale);
 	}
 }
