@@ -34,6 +34,11 @@ public class TwineVariables
         this.diction[var] = val;
     }
 
+    public void AssignValueArithmetic(string var, int val)
+    {
+        this.diction[var] += val;
+    }
+
     public string GetValue(string var)
     {
         if (diction.ContainsKey(var))

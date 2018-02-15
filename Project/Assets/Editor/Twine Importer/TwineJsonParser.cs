@@ -180,8 +180,16 @@ public class TwineJsonParser
                 string variable = variableRegex.Match(expression).Value;
                 string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
                 string link = linkRegex.Match(expression).Groups[1].Value;
-                node.AddConditional(variable, matchValue, link);
+                node.AddConditional(variable, matchValue, link, true);
                 Debug.Log("Adding conditional...");
+            }
+            else if (ifnotRegex.IsMatch(expression))
+            {
+                string variable = variableRegex.Match(expression).Value;
+                string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
+                string link = linkRegex.Match(expression).Groups[1].Value;
+                node.AddConditional(variable, matchValue, link, false);
+                Debug.Log("Adding not conditional...");
             }
             else
             {
