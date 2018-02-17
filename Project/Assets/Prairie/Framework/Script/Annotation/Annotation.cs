@@ -45,8 +45,6 @@ public class Annotation : Interaction
 	// Journal option
 	public bool addToJournal = true;
 
-    private bool active = false;
-
     private GUIStyle fullStyle;
     private GUIStyle summaryStyle;
     
@@ -104,7 +102,6 @@ public class Annotation : Interaction
     {
         if (importType != (int)ImportTypes.NONE)
         {
-            active = true;
             FirstPersonInteractor player = this.GetPlayer();
             if (player != null)
             {
@@ -115,35 +112,14 @@ public class Annotation : Interaction
 				if (addToJournal && annotationType == (int)AnnotationTypes.SUMMARY) {
 					player.GetComponentInChildren<Journal> ().AddToJournal (this);
 				}
+
+				// Display full annotation
+				FullAnnotationGui annotationGui = player.GetComponentInChildren<FullAnnotationGui> ();
+
+				if (!annotationGui.isUIActive ()) {
+					annotationGui.ActivateGui (this);
+				}
             }
-        }
-        
-    }
-
-    void OnGUI()
-    {
-        if (active)
-        {
-            //Allow the player to see and move the cursor (so they can scroll)
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-
-            //hacky way to increase the opacity of the background
-            //you would think this would be simple
-            //it isn't simple
-            GUI.Box(rectangle, Texture2D.blackTexture);
-            GUI.Box(rectangle, Texture2D.blackTexture);
-            GUI.Box(rectangle, Texture2D.blackTexture);
-
-            GUI.BeginGroup(new Rect(BOX_X + 10, BOX_Y, BOX_WIDTH, BOX_HEIGHT));
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(BOX_WIDTH - 10),
-                GUILayout.Height(BOX_HEIGHT));
-
-            DisplayAnnotation();
-
-            GUILayout.EndScrollView();
-            GUI.EndGroup();
         }
     }
 
@@ -226,21 +202,28 @@ public class Annotation : Interaction
 
     void Update()
     {
-        if (active)
-        {
-            if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Escape))
-            {
-                active = false;
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-                
-				FirstPersonInteractor player = this.GetPlayer ();
-				if (player != null) {
+		FirstPersonInteractor player = this.GetPlayer ();
+		if (player != null) {
+			FullAnnotationGui annotationGui = player.GetComponentInChildren<FullAnnotationGui> ();
+			if (annotationGui.isUIActive()) {
+
+				if (Input.GetKey (KeyCode.Q) || Input.GetKey (KeyCode.Escape)) {
+					annotationGui.DeactivateGui ();
+
+					Cursor.visible = false;
+					Cursor.lockState = CursorLockMode.Locked;
+
 					player.SetCanMove (true);
 					player.SetDrawsGUI (true);
+				} else {
+					Cursor.visible = true;
+					Cursor.lockState = CursorLockMode.None;
+
+					player.SetCanMove (false);
+					player.SetDrawsGUI (false);
 				}
-            }
-        }
+			}
+		}
     }
 
 	void OnTriggerEnter(Collider other)
