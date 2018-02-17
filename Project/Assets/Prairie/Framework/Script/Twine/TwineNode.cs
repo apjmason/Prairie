@@ -319,7 +319,8 @@ public class TwineNode : MonoBehaviour
     }
 
     /// <summary>
-    /// Change any twine variable values as appropriate
+    /// Change any twine variable values as appropriate.  This includes 
+    /// addition as well as assignment.
     /// </summary>
     private void RunVariableAssignments()
     {
@@ -329,21 +330,24 @@ public class TwineNode : MonoBehaviour
             {
                 globalVariables = TwineVariables.GetVariableObject();
             }
-            //string plusSign = "+";
-            //string minusSign = "-";
+            // This character is a marker that says to use addition rather than
+            // assignment.
+            string plusSign = "+";
 
             for (int i = 0; i < assignmentVars.Count; i++)
             {
                 string varName = assignmentVars[i];
                 string varValue = assignmentVals[i];
-                globalVariables.AssignValue(varName, varValue);
-                //if (varValue.Contains(plusSign) || varValue.Contains(minusSign))
-                //{
-                //    globalVariables.AssignValueArithmetic(varName, Int32.Parse(varValue));
-                //} else
-                //{
-                //    globalVariables.AssignValue(varName, varValue);
-                //}
+                if (!varValue.Contains(plusSign))
+                {
+                    globalVariables.AssignValue(varName, varValue);
+                }
+                else
+                {
+                    // Remove the "+" marker and increment value
+                    varValue = varValue.Substring(1);
+                    globalVariables.IncrementValue(varName, varValue);
+                }
             }
         }
     }
