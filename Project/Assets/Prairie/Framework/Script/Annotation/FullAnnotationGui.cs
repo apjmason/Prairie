@@ -38,7 +38,8 @@ public class FullAnnotationGui : MonoBehaviour
 	}
 
 	// Add the newest entry in the in-range area annotations to the UI.
-	public void DisplayFullAnnotation(Annotation a) {
+	// <param name="a">Annotation to display</param>
+	private void DisplayFullAnnotation(Annotation a) {
 		AnnotationContent content = a.content;
 		List<Texture2D> images = a.images;
 
@@ -47,44 +48,39 @@ public class FullAnnotationGui : MonoBehaviour
 				AddText (content.parsedText [i]);
 			}
 
-//			if (i < images.Count) {
-//				AddImage (images [i]);
-//			}
+			if (i < images.Count) {
+				AddImage (images [i]);
+			}
 		}
 	}
 
-	/// <summary>
-	/// Formats and displays a texture
-//	/// </summary>
-//	/// <param name="tex">Texture to display</param>
-//	void AddImage(Texture tex)
-//	{
-//		if (tex != null)
-//		{
-//			GUILayout.BeginHorizontal();
-//			GUILayout.FlexibleSpace();
-////			if (tex.width > BOX_WIDTH - 40)
-////			{
-////				//resize image if it is wider than the scrollbox
-////				float newHeight = ((BOX_WIDTH - 40) / tex.width) * ((float)tex.height);
-////				GUILayout.Label(new GUIContent(tex), GUILayout.Width(BOX_WIDTH - 40), GUILayout.Height(newHeight));
-////			}
-////			else
-////			{
-////				GUILayout.Label(new GUIContent(tex));
-////			}
-//			GUILayout.FlexibleSpace();
-//			GUILayout.EndHorizontal();
-//		}
-//	}
+	// Add an image block in full annotation panel UI.
+	// Formats and displays a texture.
+	// <param name="tex">Texture from annotation to display</param>
+	private void AddImage(Texture tex)
+	{
+		if (tex != null)
+		{
+			GameObject newImageBlock;
 
+			// Instantiate a new image prefab.
+			newImageBlock = (GameObject)GameObject.Instantiate (imagePrefab);
+			newImageBlock.transform.SetParent (contentPanel);
 
-	// Add the text block in full annotation panel UI.
-	public void AddText(string parsedText) {
+			RawImage ri = newImageBlock.GetComponentInChildren<RawImage> ();
+			ri.texture = tex;
+
+			fitImageSizeToParent (newImageBlock, ri);
+		}
+	}
+
+	// Add a text block in full annotation panel UI.
+	// Formats and displays a string.
+	// <param name="parstedText">Parsed text string from annotation to display</param>
+	private void AddText(string parsedText) {
 		GameObject newTextBlock;
 
-		Debug.Log ("Add parsed text: " + parsedText);
-		// Instantiate a new prefab if not enough entries have been created before.
+		// Instantiate a new text prefab.
 		newTextBlock = (GameObject)GameObject.Instantiate (textPrefab);
 		newTextBlock.transform.SetParent (contentPanel);
 
@@ -94,10 +90,11 @@ public class FullAnnotationGui : MonoBehaviour
 		// Update the text in the prefab.
 		Text t = newTextBlock.GetComponentInChildren<Text> ();
 		t.text = parsedText;
+		t.supportRichText = true;
 	}
 
 	// Remove the content when full annotation is deactivated.
-	public void RemoveAllContents() {
+	private void RemoveAllContents() {
 		for (int i = 0; i < contentPanel.childCount; i++) {
 			Destroy (contentPanel.GetChild (i).gameObject);
 		}
@@ -111,5 +108,22 @@ public class FullAnnotationGui : MonoBehaviour
 		float scale = (float)actualWidth / (float)originalWidth;
 		Text txt = entry.GetComponent<Text> ();
 		txt.fontSize = (int)(txt.fontSize * scale);
+	}
+
+	private void fitImageSizeToParent(GameObject entry, RawImage ri) {
+		LayoutElement le = entry.GetComponent<LayoutElement> ();
+		float preferredWidth = le.preferredWidth; // This is the preset preferred width of the prefab.
+		float imageWidth = ri.texture.width; // This is the actual width of the imported image.
+
+		// Scale the content within the prefab.
+		float scale = (float)imageWidth / (float)preferredWidth;
+
+		if (imageWidth < preferredWidth) {
+			le.preferredWidth = imageWidth;
+			le.preferredHeight = ri.texture.height;
+
+		} else {
+			le.preferredHeight = ri.texture.height / scale;
+		}
 	}
 }
