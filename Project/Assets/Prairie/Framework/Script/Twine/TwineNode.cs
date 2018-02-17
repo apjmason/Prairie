@@ -9,6 +9,15 @@ public class TwineNode : MonoBehaviour
 {
 
     public GameObject[] objectsToTrigger;
+    public GameObject[] objectsToEnable;
+ 	public GameObject[] objectsToRotate;
+ 	public int rotX = 0;
+ 	public int rotY = 0;
+ 	public int rotZ = 0;
+ 	public GameObject[] objectsToTransform;
+ 	public int trX = 0;
+ 	public int trY = 0;
+ 	public int trZ = 0;
 
     [HideInInspector]
     public string pid;
@@ -201,6 +210,18 @@ public class TwineNode : MonoBehaviour
             foreach (GameObject gameObject in objectsToTrigger)
             {
                 gameObject.InteractAll(interactor);
+            }
+            foreach (GameObject gameObject in objectsToEnable)
+            {
+                gameObject.SetActive(!gameObject.activeSelf);
+            }
+            foreach (GameObject gameObject in objectsToRotate)
+            {
+                gameObject.transform.Rotate(rotX, rotY, rotZ);
+            }
+            foreach (GameObject gameObject in objectsToTransform)
+            {
+                gameObject.transform.Translate(trX, trY, trZ);
             }
         }
     }
