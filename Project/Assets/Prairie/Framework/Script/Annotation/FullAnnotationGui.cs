@@ -82,10 +82,10 @@ public class FullAnnotationGui : MonoBehaviour
 
 		// Instantiate a new text prefab.
 		newTextBlock = (GameObject)GameObject.Instantiate (textPrefab);
-		newTextBlock.transform.SetParent (contentPanel);
+		newTextBlock.transform.SetParent (contentPanel, false);
 
 		// Scale the prefab according to resolution.
-		fitFontSizeToParent (newTextBlock);
+		fitPrefabWidthToParent(newTextBlock);
 
 		// Update the text in the prefab.
 		Text t = newTextBlock.GetComponentInChildren<Text> ();
@@ -98,16 +98,6 @@ public class FullAnnotationGui : MonoBehaviour
 		for (int i = 0; i < contentPanel.childCount; i++) {
 			Destroy (contentPanel.GetChild (i).gameObject);
 		}
-	}
-
-	private void fitFontSizeToParent(GameObject entry) {
-		double actualWidth = gameObject.transform.Find (FULLANNOTATION).GetComponent<RectTransform> ().rect.width; // This is the actual width we want to prefab to be after scaling.
-		float originalWidth = entry.GetComponent<LayoutElement>().preferredWidth; // This is the preset preferred width of the prefab.
-
-		// Scale the content within the prefab.
-		float scale = (float)actualWidth / (float)originalWidth;
-		Text txt = entry.GetComponent<Text> ();
-		txt.fontSize = (int)(txt.fontSize * scale);
 	}
 
 	private void fitImageSizeToParent(GameObject entry, RawImage ri) {
@@ -126,4 +116,20 @@ public class FullAnnotationGui : MonoBehaviour
 			le.preferredHeight = ri.texture.height / scale;
 		}
 	}
+
+	private void fitPrefabWidthToParent(GameObject entry) {
+		double actualWidth = gameObject.transform.Find (FULLANNOTATION).GetComponent<RectTransform> ().rect.width * 0.9; // This is the actual width we want to prefab to be after scaling.
+		float originalWidth = entry.GetComponent<LayoutElement>().preferredWidth; // This is the preset preferred width of the prefab.
+
+		// Constrain the prefab width to its parent panel.
+		RectTransform rt = entry.transform.GetComponent<RectTransform> ();
+		rt.sizeDelta = new Vector2((float)actualWidth, rt.rect.height);
+
+		// Scale the content within the prefab.
+		float scale = (float)actualWidth / (float)originalWidth;
+		Debug.Log ("scale: "+scale.ToString());
+
+		entry.transform.localScale = new Vector3 (scale, scale, scale);
+	}
+
 }

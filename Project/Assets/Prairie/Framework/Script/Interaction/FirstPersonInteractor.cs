@@ -75,7 +75,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			// enable Key E for carrying the object
 			this.AttemptCarry ();
 		}
-			
 
 		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
 		if (areaAnnotationsInRange.Count != 0 && this.annotationsEnabled)

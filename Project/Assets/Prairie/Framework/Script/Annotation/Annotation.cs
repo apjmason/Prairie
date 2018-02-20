@@ -46,24 +46,12 @@ public class Annotation : Interaction
 	public bool addToJournal = true;
 
     private GUIStyle summaryStyle;
-    
-    private Vector2 scrollPosition;
-
-    private Rect rectangle;
-    private readonly float BOX_X = Screen.width / 4;
-    private readonly float BOX_Y = 10;
-    private readonly float BOX_WIDTH = Screen.width / 2;
-    private readonly float BOX_HEIGHT = Screen.height - 20;
 
 	private FirstPersonInteractor player;
 
     void Start()
     {
         content = new AnnotationContent();
-
-        scrollPosition = new Vector2(0, 0);
-
-        rectangle = new Rect(BOX_X, BOX_Y, BOX_WIDTH, BOX_HEIGHT);
 
         images = new List<Texture2D>();
 
