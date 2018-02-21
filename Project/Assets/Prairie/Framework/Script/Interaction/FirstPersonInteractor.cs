@@ -49,6 +49,22 @@ public class FirstPersonInteractor : MonoBehaviour
 		// update our highlighted object
 		this.highlightedObject = this.GetHighlightedObject();
 
+
+		// draw overlay UI on highlighted object
+		SummaryAnnotationGui sa = this.GetComponentInChildren<SummaryAnnotationGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw potential stub on highlighted annotation object
+			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
+			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				sa.ActivateGui (annotation);
+			}
+		} else {
+			if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		}
+
 		// process input
 		if (Input.GetMouseButtonDown (0))
 		{
@@ -100,7 +116,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			return;
 		}
 
-
 		if (this.highlightedObject != null)
 		{
 			// draw prompt on highlighted object
@@ -111,13 +126,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			} else {
 				// draw crosshair when the prompt is left blank
 				this.drawCrosshair();
-			}
-
-			// draw potential stub on highlighted annotation object
-			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled)
-			{
-				annotation.DrawSummary();
 			}
 		}
 		else

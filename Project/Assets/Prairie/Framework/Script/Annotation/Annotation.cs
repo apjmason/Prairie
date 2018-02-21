@@ -45,8 +45,6 @@ public class Annotation : Interaction
 	// Journal option
 	public bool addToJournal = true;
 
-    private GUIStyle summaryStyle;
-
 	private FirstPersonInteractor player;
 
     void Start()
@@ -99,38 +97,6 @@ public class Annotation : Interaction
 					annotationGui.ActivateGui (this);
 				}
             }
-        }
-    }
-
-    /// <summary>
-    /// If summary exists, draw it to the screen
-    /// </summary>
-    public void DrawSummary ()
-    {
-        if (annotationType == (int)AnnotationTypes.SUMMARY && summary != "")
-        {
-            //set up the style so that the summary expands vertically
-            //TODO: figure out why this has to be here, and doesn't work if defined in start
-            summaryStyle = new GUIStyle(GUI.skin.box);
-            summaryStyle.wordWrap = true;
-            summaryStyle.richText = true;
-
-            Rect summaryBox = new Rect(Screen.width / 3, (Screen.height / 2) + (Screen.height / 16), Screen.width / 3, Screen.height / 4);
-            GUILayout.BeginArea(summaryBox);
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            string displayText = summary;
-
-            string clickForMore = "\n\n <size=12><i>Right click for more...</i></size>";
-
-            if (this.importType != (int)ImportTypes.NONE)
-            {
-                displayText += clickForMore;
-            }
-            GUILayout.Box(displayText, summaryStyle,  GUILayout.MaxWidth(Screen.width / 3));
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
         }
     }
 
