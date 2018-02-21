@@ -102,18 +102,17 @@ public class FullAnnotationGui : MonoBehaviour
 
 	private void fitImageSizeToParent(GameObject entry, RawImage ri) {
 		LayoutElement le = entry.GetComponent<LayoutElement> ();
-		float preferredWidth = le.preferredWidth; // This is the preset preferred width of the prefab.
+		double actualWidth = gameObject.transform.Find (FULLANNOTATION).GetComponent<RectTransform> ().rect.width * 0.9; // This is the actual width we want to prefab to be after scaling.
 		float imageWidth = ri.texture.width; // This is the actual width of the imported image.
 
+		le.preferredWidth = imageWidth;
+		le.preferredHeight = ri.texture.height;
+
 		// Scale the content within the prefab.
-		float scale = (float)imageWidth / (float)preferredWidth;
+		float scale = (float)actualWidth / (float)imageWidth;
 
-		if (imageWidth < preferredWidth) {
-			le.preferredWidth = imageWidth;
-			le.preferredHeight = ri.texture.height;
-
-		} else {
-			le.preferredHeight = ri.texture.height / scale;
+		if (scale < 1) {
+			entry.transform.localScale = new Vector3 (scale, scale, scale);
 		}
 	}
 
@@ -127,7 +126,6 @@ public class FullAnnotationGui : MonoBehaviour
 
 		// Scale the content within the prefab.
 		float scale = (float)actualWidth / (float)originalWidth;
-		Debug.Log ("scale: "+scale.ToString());
 
 		entry.transform.localScale = new Vector3 (scale, scale, scale);
 	}
