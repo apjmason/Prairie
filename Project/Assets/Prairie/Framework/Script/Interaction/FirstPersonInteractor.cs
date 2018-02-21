@@ -55,6 +55,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		{
 			// draw overlay UI on highlighted object
 			drawSummaryAnnotation ();
+			drawPrompt ();
 		}
 
 		// process input
@@ -116,6 +117,24 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 	}
 
+	private void drawPrompt() {
+		PromptGui pg = this.GetComponentInChildren<PromptGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw prompt on highlighted object
+			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
+			if (prompt != null) {
+				pg.ActivateGui (prompt);
+			} else if (pg.isUIActive ()) {
+				pg.DeactivateGui ();
+			}
+		} else {
+			if (pg.isUIActive ()) {
+				pg.DeactivateGui ();
+			}
+		}
+	}
+
 	/// --- GUI ---
 
 	void OnGUI()
@@ -128,12 +147,9 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		if (this.highlightedObject != null)
 		{
-			// draw prompt on highlighted object
 			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
-			if (prompt != null && prompt.GetPrompt().Trim() != "")
+			if (prompt == null || prompt.GetPrompt().Trim() == "")
 			{
-				prompt.DrawPrompt();
-			} else {
 				// draw crosshair when the prompt is left blank
 				this.drawCrosshair();
 			}
