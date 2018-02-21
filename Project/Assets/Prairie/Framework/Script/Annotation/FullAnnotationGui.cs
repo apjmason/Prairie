@@ -110,9 +110,11 @@ public class FullAnnotationGui : MonoBehaviour
 
 		// Scale the content within the prefab.
 		float scale = (float)actualWidth / (float)imageWidth;
+		entry.transform.localScale = new Vector3 (1, 1, 1);
 
 		if (scale < 1) {
-			entry.transform.localScale = new Vector3 (scale, scale, scale);
+			le.preferredWidth = (int)(le.preferredWidth * scale);
+			le.preferredHeight = (int)(le.preferredHeight * scale);
 		}
 	}
 
