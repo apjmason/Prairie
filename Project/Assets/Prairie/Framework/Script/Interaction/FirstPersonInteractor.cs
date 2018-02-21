@@ -50,19 +50,11 @@ public class FirstPersonInteractor : MonoBehaviour
 		this.highlightedObject = this.GetHighlightedObject();
 
 
-		// draw overlay UI on highlighted object
-		SummaryAnnotationGui sa = this.GetComponentInChildren<SummaryAnnotationGui> ();
-
-		if (this.highlightedObject != null) {
-			// draw potential stub on highlighted annotation object
-			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
-				sa.ActivateGui (annotation);
-			}
-		} else {
-			if (sa.isUIActive ()) {
-				sa.DeactivateGui ();
-			}
+		// else, hide overlay GUI in certain contexts (such as while slideshow is playing, etc.)
+		if (this.drawsGUI)
+		{
+			// draw overlay UI on highlighted object
+			drawSummaryAnnotation ();
 		}
 
 		// process input
@@ -102,6 +94,24 @@ public class FirstPersonInteractor : MonoBehaviour
 					// Player interact with the selected annotation object
 					areaAnnotationsInRange[a].Interact (this.gameObject);
 				}
+			}
+		}
+	}
+
+	private void drawSummaryAnnotation() {
+		SummaryAnnotationGui sa = this.GetComponentInChildren<SummaryAnnotationGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw potential stub on highlighted annotation object
+			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
+			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				sa.ActivateGui (annotation);
+			} else if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		} else {
+			if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
 			}
 		}
 	}
@@ -232,9 +242,13 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
 		{
-			if (i is Annotation)
-			{
-				i.Interact (this.gameObject);
+			if (i is Annotation) {
+				Annotation a = (Annotation)i;
+
+				// Only allow right click to open full annotation if it is a summary annotation.
+				if (a.annotationType == (int)AnnotationTypes.SUMMARY) {
+					i.Interact (this.gameObject);
+				}
 			}
 		}
 	}
