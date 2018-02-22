@@ -7,11 +7,10 @@ public class PromptGui : MonoBehaviour
 {
 	// Name of the promptGui object in game scene.
 	private const string PROMPT = "PromptPanel";
-	private const int DEFAULTFONTSIZE = 14;
 
 	private bool active = false;
 	private GameObject promptGameObject;
-
+	private string currentText;
 
 	public FirstPersonInteractor FPI;
 
@@ -19,6 +18,7 @@ public class PromptGui : MonoBehaviour
 	void Start ()
 	{
 		promptGameObject = gameObject.transform.Find (PROMPT).gameObject;
+		currentText = "";
 		promptGameObject.SetActive (active);
 	}
 
@@ -37,6 +37,10 @@ public class PromptGui : MonoBehaviour
 		return active;
 	}
 
+	public string GetCurrentText() {
+		return currentText;
+	}
+
 	// Add the newest entry in the in-range area annotations to the UI.
 	// <param name="a">Annotation to display</param>
 	private bool DisplayPrompt(Prompt p, Text t) {
@@ -44,6 +48,7 @@ public class PromptGui : MonoBehaviour
 
 		if (!string.IsNullOrEmpty (content.Trim ())) {
 			t.text = content;
+			currentText = content;
 			return true;
 		}
 		return false;

@@ -60,7 +60,8 @@ public class PromptEditor : Editor {
         if (prompt.isCyclic)
         {
             GUIContent secondLabel = new GUIContent("Second Prompt", "Second prompt to display, will toggle between this and first prompt.");
-            EditorGUI.BeginChangeCheck();
+			GUILayout.Label (secondLabel);
+			EditorGUI.BeginChangeCheck();
 			string _secondPrompt = GUILayout.TextArea(prompt.secondPrompt, 30, textAreaStyle, GUILayout.Height(18),
 				GUILayout.Width(EditorGUIUtility.currentViewWidth - 50), GUILayout.ExpandWidth(false));
             if (EditorGUI.EndChangeCheck())

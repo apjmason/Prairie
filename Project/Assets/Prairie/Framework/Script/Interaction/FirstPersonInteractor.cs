@@ -105,8 +105,12 @@ public class FirstPersonInteractor : MonoBehaviour
 		if (this.highlightedObject != null) {
 			// draw potential stub on highlighted annotation object
 			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
-				sa.ActivateGui (annotation);
+			if (annotation != null && this.annotationsEnabled && 
+				annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				// draw UI if it is inactive or if the content changes
+				if (!sa.isUIActive () || !annotation.summary.Equals(sa.GetCurrentText())) {
+					sa.ActivateGui (annotation);
+				}
 			} else if (sa.isUIActive ()) {
 				sa.DeactivateGui ();
 			}
@@ -124,8 +128,11 @@ public class FirstPersonInteractor : MonoBehaviour
 			// draw prompt on highlighted object
 			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
 			if (prompt != null) {
-				pg.ActivateGui (prompt);
-			} else if (pg.isUIActive ()) {
+				// draw UI if it is inactive or if the content changes
+				if (!pg.isUIActive () || !prompt.GetPrompt().Equals(pg.GetCurrentText())) {
+					pg.ActivateGui (prompt);
+				}
+			} else if (pg.isUIActive()) {
 				pg.DeactivateGui ();
 			}
 		} else {
