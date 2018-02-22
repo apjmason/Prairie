@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 //using TwineVariables;
@@ -121,20 +122,35 @@ public class TwineNode : MonoBehaviour {
 		}
 	}
 
-	public void OnGUI()
+    private float vScrollBarValue;
+    public Vector2 scrollPosition = new Vector2(0, 0);
+    private string innerText;
+    public void OnGUI()
 	{
         if ((fanfold) && (allMinimized == false)) {
-            float frameWidth = Math.Min(Screen.width / 3, 150);
-            float frameHeight = Math.Min(Screen.height / 2, 500);
+            float frameWidth = Math.Min(Screen.width / 2, 200);
+            float frameHeight = Math.Min(Screen.height / 2, 100);
 //            height += frameHeight/10;
 //            this.heightAdded = true;
             int index = TwineNodeList.IndexOf(this);
-            Rect frame = new Rect (10+index*150, 10, frameWidth, frameHeight);
-            GUI.BeginGroup (frame);
-			GUIStyle style = new GUIStyle (GUI.skin.box);
-			style.wordWrap = true;
+            Rect frame = new Rect (10, 10+index*100, frameWidth, frameHeight);
+            
+            GUIStyle style = new GUIStyle (GUI.skin.box);
+            style.wordWrap = true;
 			style.fixedWidth = frameWidth;
-			GUILayout.Box (this.content, style);
+            
+            GUI.BeginGroup(new Rect(20, 10+index*100, frameWidth, frameHeight));
+            
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(frameWidth - 10), GUILayout.Height(frameHeight));
+            GUILayout.Label(new GUIContent(this.content), style, GUILayout.Width(frameWidth - 40), GUILayout.ExpandHeight(true));
+//            vScrollBarValue = GUI.VerticalScrollbar (frame, vScrollBarValue, 1.0f, 0.0f, 10.0f);
+            
+//            innerText = GUI.TextArea(new Rect (10,10,frameWidth-20,300), this.content);
+			
+//            Cursor.visible = true;
+//            GUI.BeginGroup (frame,this.content,style);
+//            GUILayout.Box(this.content, style);
+            GUI.EndScrollView();
 //            print(height);
 
 			if (isDecisionNode) {
@@ -240,15 +256,8 @@ public class TwineNode : MonoBehaviour {
 		{
 			this.enabled = true;
 			this.isMinimized = false;
-//			this.TakeAction();
 			this.isOptionsGuiOpen = false;
-            foreach (GameObject parent in parents) {
-                TwineNode node = parent.GetComponent<TwineNode> ();
-                if (node.enabled) {
-                    insertIndex = TwineNodeList.IndexOf(node);
-                    node.Deactivate ();
-                }
-            }
+            this.DeactivateAllParents();
             TwineNodeList.Insert(insertIndex,this);
 //            TwineNodeList.Add(this);
             visibleNodeIndex = TwineNodeList.IndexOf(this);
@@ -313,13 +322,13 @@ public class TwineNode : MonoBehaviour {
 	/// <summary>
 	/// Deactivate all parents of this Twine Node.
 	/// </summary>
-//	private void DeactivateAllParents()
-//	{
-//		foreach (GameObject parent in parents) 
-//		{
-//			parent.GetComponent<TwineNode> ().Deactivate ();
-//		}
-//	}
+	private void DeactivateAllParents()
+	{
+		foreach (GameObject parent in parents) 
+		{
+			parent.GetComponent<TwineNode> ().Deactivate ();
+		}
+	}
 
 
 	/// <summary>
