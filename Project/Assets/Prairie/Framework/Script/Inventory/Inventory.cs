@@ -55,13 +55,10 @@ public class Inventory : Interaction, IPointerClickHandler
 
 	protected override void PerformAction()
 	{
-		active = true;
 		FirstPersonInteractor player = this.GetPlayer();
 		if (player != null)
 		{
-			player.SetCanMove (false);
-			player.SetDrawsGUI (false);
-			player.SetUseCursor (true);
+			player.setWorldActive("Inventory");
 		}
 	}
 
@@ -78,15 +75,11 @@ public class Inventory : Interaction, IPointerClickHandler
 
 
 	private void returnToGameStateFromInventory() {
-		active = false;
-		Cursor.visible = false;
-		Cursor.lockState = CursorLockMode.Locked;
 
 		FirstPersonInteractor player = this.GetPlayer ();
 		if (player != null) {
-			player.SetCanMove (true);
-			player.SetDrawsGUI (true);
-			player.SetUseCursor (false);
+
+			player.setWorldActive("Inventory");
 		}
 	}
 

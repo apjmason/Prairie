@@ -24,7 +24,6 @@ public class Journal : MonoBehaviour
 
 		if (!journal.Contains (e)) {
 			journal.Add (e);
-			Debug.Log ("Add " + e.title + "'s annotation info to journal.");
 		}
 	}
 }

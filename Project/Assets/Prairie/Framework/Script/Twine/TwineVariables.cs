@@ -4,39 +4,89 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-public class TwineVariables {
+public class TwineVariables
+{
 
-	private static TwineVariables instance;
-	private Dictionary<string, string> diction;
+    private static TwineVariables instance;
+    private Dictionary<string, string> varDictionary;
 
-	private TwineVariables(string[] vars) {
+    private TwineVariables()
+    {
+        this.varDictionary = new Dictionary<string, string>();
+    }
 
-		this.diction = new Dictionary<string, string>();
-		this.diction ["color"] = "white";
+    public Dictionary<string, string> GetVariables()
+    {
+        return varDictionary;
+    }
 
-//		foreach (string r in vars) {
-//			string ar = r.Replace ("((", string.Empty).Replace ("))", string.Empty);
-//			List<string> pair = ar.Split (new string[] { ":" }, StringSplitOptions.None).ToList();
-//			this.diction [pair[0]] = pair[1];
-//		}
-	}
+    /// <summary>
+    /// Assign a value to a twine variable.  The value must be provided as a 
+    /// string, and it can be parsed as an int later if needed.
+    /// </summary>
+    /// <param name="var">Variable name</param>
+    /// <param name="val">New value</param>
+    public void AssignValue(string var, string val)
+    {
+        this.varDictionary[var] = val;
+    }
+    
+    /// <summary>
+    /// Adds a value to an existing variable value.  If both values are 
+    /// numeric, they are converted to ints, summed, and then stored as a 
+    /// string; otherwise, the two strings are concatenated
+    /// </summary>
+    /// <param name="var"></param>
+    /// <param name="val"></param>
+    public void IncrementValue(string var, string val)
+    {
+        if (varDictionary.ContainsKey(var))
+        {
+            // Try parsing the two values as ints
+            int val1;
+            int val2;
+            if (Int32.TryParse(varDictionary[var], out val1) &&
+                Int32.TryParse(val, out val2))
+            {
+                int newVal = val1 + val2;
+                varDictionary[var] = newVal.ToString();
+            }
+            // If that fails, concatenate them
+            else
+            {
+                varDictionary[var] = varDictionary[var] + val;
+            }
+            
+        }
+        else
+        {
+            // If there is no existing variable for this value, create one and
+            // set it equal to the provided value.
+            varDictionary[var] = val;
+        }
+    }
 
-	public Dictionary<string, string> Variables(){
-		return diction;
-	}
+    public string GetValue(string var)
+    {
+        if (varDictionary.ContainsKey(var))
+        {
+            return varDictionary[var];
+        }
+        else
+        {
+            // TODO: Discuss the best way to handle this situation
+            return "";
+        }
+    }
 
-	public void AssignValue(string var, string val){
-		// TODO: check if there is a var, if not, automatically create one
-		this.diction[var] = val;
-	}
 
-
-	public static TwineVariables GetTwineVariables(string[] vars) {
-		if (instance == null)
-		{
-			instance = new TwineVariables(vars);
-		}
-		return instance;
-	}
+    public static TwineVariables GetVariableObject()
+    {
+        if (instance == null)
+        {
+            instance = new TwineVariables();
+        }
+        return instance;
+    }
 
 }

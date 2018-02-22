@@ -10,79 +10,86 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 #endif
 
-public class TwineJsonParser {
+public class TwineJsonParser
+{
 
-	public const string PRAIRIE_DECISION_TAG = "prairie_decision";
-	public const string PRAIRIE_CONDITION_TAG = "prairie_condition";
+    public const string PRAIRIE_DECISION_TAG = "prairie_decision";
+    public const string PRAIRIE_CONDITION_TAG = "prairie_condition";
 
-	public static void ImportFromString(string jsonString, string prefabDestinationDirectory)
-	{
-		Debug.Log ("Importing JSON...");
+    public static void ImportFromString(string jsonString, string prefabDestinationDirectory)
+    {
+        Debug.Log("Importing JSON...");
 
-		ReadJson (jsonString, prefabDestinationDirectory);
+        ReadJson(jsonString, prefabDestinationDirectory);
 
-		Debug.Log ("Done!");
-	}
-		
-	public static void ReadJson (string jsonString, string prefabDestinationDirectory)
-	{
-		// parse using `SimpleJSON`
-		JSONNode parsedJson = JSON.Parse(jsonString);
-		JSONArray parsedArray = parsedJson["passages"].AsArray;
+        Debug.Log("Done!");
+    }
 
-		// parent game object which will be the story prefab
-		string nameOfStory = parsedJson["name"];
-		Debug.Log (nameOfStory);
-		GameObject parent = new GameObject(nameOfStory);
+    public static void ReadJson(string jsonString, string prefabDestinationDirectory)
+    {
+        // parse using `SimpleJSON`
+        JSONNode parsedJson = JSON.Parse(jsonString);
+        JSONArray parsedArray = parsedJson["passages"].AsArray;
 
-		// Now, let's make GameObject nodes out of every twine/json node.
-		//	Also, for easy access when setting up our parent-child relationships,
-		//	we'll keep two dictionaries, linking names --> JSONNodes and names --> GameObjects
-		Dictionary<string, JSONNode> twineNodesJsonByName = new Dictionary<string, JSONNode>();
-		Dictionary<string, GameObject> twineGameObjectsByName = new Dictionary<string, GameObject>();
+        // parent game object which will be the story prefab
+        string nameOfStory = parsedJson["name"];
+        Debug.Log(nameOfStory);
+        GameObject parent = new GameObject(nameOfStory);
 
-		string startNodePid = parsedJson ["startnode"].ToString ();
-		startNodePid = startNodePid.Replace ('"', ' ').Trim(); // remove the surrounding quotes (leftover from JSONNode toString() method)
+        // Now, let's make GameObject nodes out of every twine/json node.
+        //	Also, for easy access when setting up our parent-child relationships,
+        //	we'll keep two dictionaries, linking names --> JSONNodes and names --> GameObjects
+        Dictionary<string, JSONNode> twineNodesJsonByName = new Dictionary<string, JSONNode>();
+        Dictionary<string, GameObject> twineGameObjectsByName = new Dictionary<string, GameObject>();
 
-		foreach (JSONNode storyNode in parsedArray)
-		{
-			GameObject twineNodeObject = MakeGameObjectFromStoryNode (storyNode);
+        string startNodePid = parsedJson["startnode"].ToString();
 
-			// Bind this node to the parent "Story" object
-			twineNodeObject.transform.SetParent (parent.transform);
+        // remove the surrounding quotes (leftover from JSONNode toString() method)
+        startNodePid = startNodePid.Replace('"', ' ').Trim(); 
 
-			// Store this node and its game object in our dictionaries:
-			twineNodesJsonByName [twineNodeObject.name] = storyNode;
-			twineGameObjectsByName [twineNodeObject.name] = twineNodeObject;
+        foreach (JSONNode storyNode in parsedArray)
+        {
+            GameObject twineNodeObject = MakeGameObjectFromStoryNode(storyNode);
 
-			TwineNode twineNode = twineNodeObject.GetComponent<TwineNode> ();
+            // Bind this node to the parent "Story" object
+            twineNodeObject.transform.SetParent(parent.transform);
 
-			if (startNodePid.Equals(twineNode.pid)) {
-				// Enable/activate the start node in the story:
-				twineNodeObject.GetComponent<TwineNode> ().enabled = true;
-			}
-		}
+            // Store this node and its game object in our dictionaries:
+            twineNodesJsonByName[twineNodeObject.name] = storyNode;
+            twineGameObjectsByName[twineNodeObject.name] = twineNodeObject;
 
-		// link nodes to their children
-		MatchChildren (twineNodesJsonByName, twineGameObjectsByName);
+            TwineNode twineNode = twineNodeObject.GetComponent<TwineNode>();
 
-		// "If the directory already exists, this method does not create a new directory..."
-		// From the C# docs
-		System.IO.Directory.CreateDirectory (prefabDestinationDirectory);
+            if (startNodePid.Equals(twineNode.pid))
+            {
+                // Enable/activate the start node in the story:
+                twineNodeObject.GetComponent<TwineNode>().enabled = true;
+                // TODO: Come up with a way to actually activate the first node.  Setting "enabled" isn't nearly enough!
+                // TODO: While you're at it, mess with the parser so that it 
+                //   can create multiple twine stories per twine file.  If you feel like it.
+            }
+        }
 
-		// save a prefab to disk, and then remove the GameObject from the scene
-		string prefabDestination = prefabDestinationDirectory + "/" + parent.name + " - Twine.prefab";
-		PrefabUtility.CreatePrefab (prefabDestination, parent);
-		GameObject.DestroyImmediate (parent);
-	}
+        // link nodes to their children
+        MatchChildren(twineNodesJsonByName, twineGameObjectsByName);
 
-	/// <summary>
-	/// Turns a JSON-formatted Twine node into a GameObject with all the relevant data in a TwineNode component.
-	/// </summary>
-	/// <returns>GameObject of single node.</returns>
-	/// <param name="nodeJSON">A Twine Node, in JSON format</param>
-	public static GameObject MakeGameObjectFromStoryNode (JSONNode nodeJSON)
-	{
+        // "If the directory already exists, this method does not create a new directory..."
+        // - From the C# docs
+        System.IO.Directory.CreateDirectory(prefabDestinationDirectory);
+
+        // save a prefab to disk, and then remove the GameObject from the scene
+        string prefabDestination = prefabDestinationDirectory + "/" + parent.name + " - Twine.prefab";
+        PrefabUtility.CreatePrefab(prefabDestination, parent);
+        GameObject.DestroyImmediate(parent);
+    }
+
+    /// <summary>
+    /// Turns a JSON-formatted Twine node into a GameObject with all the relevant data in a TwineNode component.
+    /// </summary>
+    /// <returns>GameObject of single node.</returns>
+    /// <param name="nodeJSON">A Twine Node, in JSON format</param>
+    public static GameObject MakeGameObjectFromStoryNode(JSONNode nodeJSON)
+    {
 #if UNITY_EDITOR
 
 		GameObject nodeGameObject = new GameObject(nodeJSON["name"]);
@@ -95,26 +102,10 @@ public class TwineJsonParser {
 
 		twineNode.tags = GetDequotedStringArrayFromJsonArray(nodeJSON["tags"]);
 
-		twineNode.content = GetVisibleText (nodeJSON["text"]);
-
-        //TODO:  Come up with a better name, and make this actually do something useful
+        twineNode.content = GetVisibleText (nodeJSON["text"]);
+        
         string[] variableExpressions = GetVariableExpressions(nodeJSON["text"]);
         ActivateVariableExpressions(variableExpressions, twineNode);
-
-		// If Start Node, Parse the content and store variables
-		if (twineNode.name.Equals("start")) {
-			Debug.Log("ADD VAR TO START");
-			string[] raw = twineNode.content.Split(new string[] { "\n" }, StringSplitOptions.None).Reverse().Skip(1).Reverse().ToArray();
-			Debug.Log("ready to init");
-			twineNode.iniVariables(raw);
-
-
-			// foreach (string r in raw) {
-			// 	string ar = r.Replace ("((", string.Empty).Replace ("))", string.Empty);
-			// 	List<string> pair = ar.Split (":").ToList ();
-			// 	twineNode.iniVariables (pair[0], pair[1]);
-			// }
-		}
 
 		// Upon creation of this node, ensure that it is a decision node if it has
 		//	the decision tag:
@@ -152,7 +143,6 @@ public class TwineJsonParser {
         return strings;
     }
 
-    //TODO: Finish
     /// <summary>
     /// Sets the 
     /// </summary>
@@ -161,98 +151,165 @@ public class TwineJsonParser {
     /// <returns>True, unless something goes wrong</returns>
     public static bool ActivateVariableExpressions(string[] expressions, TwineNode node)
     {
+        // Matches an alphanumeric string preceded by a dollar sign
+        // E.g. 
+        //   "$var"
+        //   "$1Apple3" 
+        //   not "$.var"
+        //   not "$app le"
         Regex variableRegex = new Regex("\\$\\w*");
-        Regex newValueRegex = new Regex(":\\s*(\\w*)");
-        Regex matchValueRegex = new Regex("=\\s*(\\w*)");
-        Regex assignmentRegex = new Regex("\\$\\w*:");
+
+        // Finds an instance of a variable being assigned, starting with the 
+        // ":" and including the assigned value in a sub-group.
+        // E.g. 
+        //   ":red" and "red"
+        //   ":      -3" and "-3"
+        Regex assignmentRegex = new Regex(":\\s*(-?\\w*)");
+
+        // Looks for addition and retrieves the variable, the operator, and 
+        // the value.
+        // E.g.
+        //   "$var + 1" and "var", "+", "1"
+        //   "$var+-1" and "var", "+", "-1"
+        //   "$var -apple" and "var", "-", "apple"
+        Regex additionRegex = new Regex("\\$(\\w*)\\s*([+-])\\s*(-?\\w*)");
+
+        // Like the previous, but detects a value being compared to a value 
+        // with an equals sign rather than assignments.  Also gets comparison
+        // type.
+        // E.g.
+        //   "= red" and "=", "red"
+        //   "!= 3" and "!=", "3"
+        Regex matchValueRegex = new Regex("(!?=)\\s*(-?\\w*)");
+
+        // Finds a twine link - i.e. a double-bracketed line of text - with the
+        // link content in a sub-group
+        // E.g. 
+        //   "[[Next Node]]" and "Next Node"
         Regex linkRegex = new Regex("\\[\\[([^\\]]*)\\]\\]");
+
+        // Matches all variable lines that start with "if", ignoring case
         Regex ifRegex = new Regex("^\\s*if", RegexOptions.IgnoreCase);
+
+        Debug.Log("Going through variable expressions...");
         foreach (string expression in expressions)
         {
-            // node.content += "\n" + expression;
+            Debug.Log("Analyzing var expression...");
             if (assignmentRegex.IsMatch(expression))
             {
-                // node.content += "\n (assignment)";
                 string variable = variableRegex.Match(expression).Value;
-                string newValue = newValueRegex.Match(expression).Groups[1].Value;
-                // node.content += "\n Set '" + variable + "' to '" + newValue + "'";
-                node.iniAssignments(variable, newValue);
+                string value = assignmentRegex.Match(expression).Groups[1].Value;
+                node.AddAssignment(variable, value);
+                Debug.Log("Adding assignment...");
+                Debug.Log("Assignment value = " + value);
+            }
+            else if (additionRegex.IsMatch(expression))
+            {
+                GroupCollection matches = additionRegex.Match(expression).Groups;
+                string variable = matches[1].Value;
+                string operation = matches[2].Value;
+                string value = matches[3].Value;
+                // If we're subtracting, flip the sign of the value
+                if (operation[0] == '-')
+                {
+                    if (value[0] != '-')
+                    {
+                        value = "-" + value;
+                    }
+                    else
+                    {
+                        value = value.Substring(1);
+                    }
+                }
+                // Now add a "+" to the value to mark this as addition, not 
+                // assignment
+                value = "+" + value;
+                node.AddAssignment(variable, value);
+                Debug.Log("Adding addition...");
+                Debug.Log("Addition value = " + value);
             }
             else if (ifRegex.IsMatch(expression))
             {
-                // node.content += "\n (conditional)";
+                // This condition covers both types of "if" statement.  
+                // We should probably later extend it to cover <, >, <=, and >=,
+                // if we decide to implement them.
+                Debug.Log("Adding conditional...");
                 string variable = variableRegex.Match(expression).Value;
-                string matchValue = matchValueRegex.Match(expression).Groups[1].Value;
+                string operation = matchValueRegex.Match(expression).Groups[1].Value;
+                Debug.Log("Operation: " + operation);
+                string matchValue = matchValueRegex.Match(expression).Groups[2].Value;
                 string link = linkRegex.Match(expression).Groups[1].Value;
-                // node.content += "\n Proceed to '" + link + "' if '" + variable + "' = '" + matchValue + "'";
-                string[] variableMatch = { variable, matchValue };
-                node.iniConditionals(link, variableMatch);
+                node.AddConditional(variable, matchValue, link, operation);
             }
             else
             {
-                node.content += "\n Unknown!";
+                Debug.Log("Unknown variable expression!");
             }
         }
         return false;
     }
 
     public static void MatchChildren(Dictionary<string, JSONNode> twineNodesJsonByName, Dictionary<string, GameObject> gameObjectsByName)
-	{
-		foreach(KeyValuePair<string, GameObject> entry in gameObjectsByName)
-		{
-			string nodeName = entry.Key;
-			GameObject nodeObject = entry.Value;
+    {
+        foreach (KeyValuePair<string, GameObject> entry in gameObjectsByName)
+        {
+            string nodeName = entry.Key;
+            GameObject nodeObject = entry.Value;
 
-			TwineNode twineNode = nodeObject.GetComponent<TwineNode> ();
-			JSONNode jsonNode = twineNodesJsonByName [nodeName];
-		
-			// Iterate through the links and establish object relationships:
-			JSONNode nodeLinks = jsonNode ["links"];
+            TwineNode twineNode = nodeObject.GetComponent<TwineNode>();
+            JSONNode jsonNode = twineNodesJsonByName[nodeName];
 
-			twineNode.children = new GameObject[nodeLinks.Count];
-			twineNode.childrenNames = new string[nodeLinks.Count];
+            // Iterate through the links and establish object relationships:
+            JSONNode nodeLinks = jsonNode["links"];
 
-			for (int i = 0; i < nodeLinks.Count; i++) {
-				JSONNode link = nodeLinks [i];
-				string linkName = link ["name"];
-				GameObject linkDestination = gameObjectsByName [link ["link"]];
+            twineNode.children = new GameObject[nodeLinks.Count];
+            twineNode.linkNames = new string[nodeLinks.Count];
 
-				// Remember parent:
-				linkDestination.GetComponent<TwineNode> ().parents.Add (nodeObject);
+            for (int i = 0; i < nodeLinks.Count; i++)
+            {
+                JSONNode link = nodeLinks[i];
+                string linkName = link["name"];
+                GameObject linkDestination = gameObjectsByName[link["link"]];
 
-				// Set link as a child, and remember the name.
-				twineNode.children[i] = linkDestination;
-				twineNode.childrenNames [i] = linkName;
-			}
-		}
-	}
+                // Remember parent:
+                linkDestination.GetComponent<TwineNode>().parents.Add(nodeObject);
 
-    //TODO:  Update this.  At present, it just cuts everything off after the first single open bracket.  Bad.
+                // Set link as a child, and remember the name.
+                twineNode.children[i] = linkDestination;
+                twineNode.linkNames[i] = linkName;
+            }
+        }
+    }
+
     /// <summary>
     /// Returns the text of a node without links or variable expressions
     /// </summary>
     /// <returns>The content without children atached.</returns>
     /// <param name="content">Content with children attached.</param>
-    public static string GetVisibleText (string content)
-	{
+
+    public static string GetVisibleText(string content)
+    {
+        // Pattern for text surrounded by double parentheses or double brackets
+        //  e.g. "[[text blah blay asdlh]]" or "((asddflhjwherkkh}}"
         Regex invisibleTextRegex = new Regex("(\\[\\[([^\\]]*)\\]\\])|(\\(\\([^)]*\\)\\))");
         return invisibleTextRegex.Replace(content, "");
-	}
+    }
 
-	static string[] GetDequotedStringArrayFromJsonArray (JSONNode jsonNode)
-	{
-		if (jsonNode == null) {
-			return null;
-		}
+    static string[] GetDequotedStringArrayFromJsonArray(JSONNode jsonNode)
+    {
+        if (jsonNode == null)
+        {
+            return null;
+        }
 
-		string[] stringArray = new string[jsonNode.Count];
-		for (int i = 0; i < jsonNode.Count; i++)
-		{
-			string quotedString = jsonNode [i].ToString();
-			string dequotedString = quotedString.Replace ('"', ' ').Trim ();
-			stringArray [i] = dequotedString;
-		}
+        string[] stringArray = new string[jsonNode.Count];
+        for (int i = 0; i < jsonNode.Count; i++)
+        {
+            string quotedString = jsonNode[i].ToString();
+            string dequotedString = quotedString.Replace('"', ' ').Trim();
+            stringArray[i] = dequotedString;
+        }
 
-		return stringArray;
-	}
+        return stringArray;
+    }
 }

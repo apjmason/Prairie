@@ -20,6 +20,11 @@ public class FirstPersonInteractor : MonoBehaviour
 	// List of potential annotation objects the player could reach
 	public List<Annotation> areaAnnotationsInRange = new List<Annotation>();
 	public bool annotationsEnabled = true;
+	public bool worldFrozen = false;
+	public bool startMenuOpen = false;
+	public bool journalOpen = false;
+	public bool inventoryAccess = false;
+    public int dialogue = 0;
 
 	// Control-related
 
@@ -44,6 +49,15 @@ public class FirstPersonInteractor : MonoBehaviour
 	{
 		// update our highlighted object
 		this.highlightedObject = this.GetHighlightedObject();
+
+
+		// else, hide overlay GUI in certain contexts (such as while slideshow is playing, etc.)
+		if (this.drawsGUI)
+		{
+			// draw overlay UI on highlighted object
+			drawSummaryAnnotation ();
+			drawPrompt ();
+		}
 
 		// process input
 		if (Input.GetMouseButtonDown (0))
@@ -86,6 +100,49 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 	}
 
+	private void drawSummaryAnnotation() {
+		SummaryAnnotationGui sa = this.GetComponentInChildren<SummaryAnnotationGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw potential stub on highlighted annotation object
+			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
+			if (annotation != null && this.annotationsEnabled && 
+				annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				// draw UI if it is inactive or if the content changes
+				if (!sa.isUIActive () || !annotation.summary.Equals(sa.GetCurrentText())) {
+					sa.ActivateGui (annotation);
+				}
+			} else if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		} else {
+			if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		}
+	}
+
+	private void drawPrompt() {
+		PromptGui pg = this.GetComponentInChildren<PromptGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw prompt on highlighted object
+			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
+			if (prompt != null) {
+				// draw UI if it is inactive or if the content changes
+				if (!pg.isUIActive () || !prompt.GetPrompt().Equals(pg.GetCurrentText())) {
+					pg.ActivateGui (prompt);
+				}
+			} else if (pg.isUIActive()) {
+				pg.DeactivateGui ();
+			}
+		} else {
+			if (pg.isUIActive ()) {
+				pg.DeactivateGui ();
+			}
+		}
+	}
+
 	/// --- GUI ---
 
 	void OnGUI()
@@ -96,24 +153,13 @@ public class FirstPersonInteractor : MonoBehaviour
 			return;
 		}
 
-
 		if (this.highlightedObject != null)
 		{
-			// draw prompt on highlighted object
 			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
-			if (prompt != null && prompt.GetPrompt().Trim() != "")
+			if (prompt == null || prompt.GetPrompt().Trim() == "")
 			{
-				prompt.DrawPrompt();
-			} else {
 				// draw crosshair when the prompt is left blank
 				this.drawCrosshair();
-			}
-
-			// draw potential stub on highlighted annotation object
-			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled)
-			{
-				annotation.DrawSummary();
 			}
 		}
 		else
@@ -121,9 +167,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			// draw a crosshair when we have no highlighted object
 			this.drawCrosshair();
 		}
-		
-		// draw toolbar with our set of accessable area annotations
-		this.drawToolbar(this.areaAnnotationsInRange);
 	}
 
 	private void drawCrosshair()
@@ -132,45 +175,49 @@ public class FirstPersonInteractor : MonoBehaviour
 		GUI.Box (frame, "");
 	}
 
-	// Draw the Area Annotation box in the game (lower left corner)
-	private void drawToolbar(List<Annotation> annotations)
-	{
-		if (annotations.Count != 0 && this.annotationsEnabled)
-		{
-			float xMargin = 10f;
-			float yMargin = 10f;
-			float rowSize = 35f;
-
-			float toolbarWidth = Mathf.Min (0.25f * Screen.width, 500f);
-			float toolbarHeight = (annotations.Count + 1) * rowSize;	// first row is a label
-
-			// GUI coordinate system places 0,0 in top left corner
-			float currentX = xMargin;
-			float currentY = Screen.height - (yMargin + toolbarHeight);
-
-			// Make a background box
-			Rect toolbarFrame = new Rect (currentX, currentY, toolbarWidth, toolbarHeight);
-			GUI.Box(toolbarFrame, "Area Annotations");
-			
-			// Shift down and indent 
-			currentX += 10f;
-			currentY += rowSize;
-
-			// Make list of buttons, paired with annotation summaries
-			int buttonIndex = 1;
-			foreach (Annotation a in annotations)
-			{
-				float rowHeight = 0.6f*rowSize;
-				Rect buttonFrame = new Rect (currentX, currentY, 20, 20);
-				Rect labelFrame = new Rect (currentX + 30, currentY, toolbarWidth, rowHeight);
-
-				GUI.Button (buttonFrame, buttonIndex.ToString());
-				GUI.Label (labelFrame, a.summary);
-
-				currentY += rowSize;
-				buttonIndex++;
+	//Set the world active or not
+	public void setWorldActive(string pauseType){
+		if (pauseType == "Pause Menu") {
+			if (startMenuOpen) {
+				startMenuOpen = false;
+			} else {
+				startMenuOpen = true;
 			}
 		}
+		if (pauseType == "Journal") {
+			if (journalOpen) {
+				journalOpen = false;
+			} else {
+				journalOpen = true;
+			}
+		}
+		if (pauseType == "Inventory") {
+			if (inventoryAccess) {
+				inventoryAccess = false;
+			} else {
+				inventoryAccess = true;
+			}
+		}
+
+        if (pauseType == "DialogueOpen")
+        {
+            dialogue += 1;
+        }
+        if (pauseType == "DialogueClose")
+        {
+            dialogue -= 1;
+        }
+
+        if (!startMenuOpen && !journalOpen && !inventoryAccess && dialogue == 0) {
+			Time.timeScale = 1;
+			Cursor.visible = false;
+			Cursor.lockState = CursorLockMode.Locked;
+		} else {
+			Time.timeScale = 0;
+			Cursor.visible = true;
+			Cursor.lockState = CursorLockMode.None;
+		}
+
 	}
 
 	/// --- Trigger Areas ---
@@ -228,9 +275,13 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
 		{
-			if (i is Annotation)
-			{
-				i.Interact (this.gameObject);
+			if (i is Annotation) {
+				Annotation a = (Annotation)i;
+
+				// Only allow right click to open full annotation if it is a summary annotation.
+				if (a.annotationType == (int)AnnotationTypes.SUMMARY) {
+					i.Interact (this.gameObject);
+				}
 			}
 		}
 	}
