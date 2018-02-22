@@ -50,6 +50,14 @@ public class FirstPersonInteractor : MonoBehaviour
 		// update our highlighted object
 		this.highlightedObject = this.GetHighlightedObject();
 
+
+		// else, hide overlay GUI in certain contexts (such as while slideshow is playing, etc.)
+		if (this.drawsGUI)
+		{
+			// draw overlay UI on highlighted object
+			drawSummaryAnnotation ();
+		}
+
 		// process input
 		if (Input.GetMouseButtonDown (0))
 		{
@@ -76,7 +84,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			// enable Key E for carrying the object
 			this.AttemptCarry ();
 		}
-			
 
 		// Prompt area annotiaion bar if annotation is enabled and there exist annotated objects within the radius 
 		if (areaAnnotationsInRange.Count != 0 && this.annotationsEnabled)
@@ -92,6 +99,24 @@ public class FirstPersonInteractor : MonoBehaviour
 		}
 	}
 
+	private void drawSummaryAnnotation() {
+		SummaryAnnotationGui sa = this.GetComponentInChildren<SummaryAnnotationGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw potential stub on highlighted annotation object
+			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
+			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				sa.ActivateGui (annotation);
+			} else if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		} else {
+			if (sa.isUIActive ()) {
+				sa.DeactivateGui ();
+			}
+		}
+	}
+
 	/// --- GUI ---
 
 	void OnGUI()
@@ -101,7 +126,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			// hide all GUI in certain contexts (such as while slideshow is playing, etc.)
 			return;
 		}
-
 
 		if (this.highlightedObject != null)
 		{
@@ -113,13 +137,6 @@ public class FirstPersonInteractor : MonoBehaviour
 			} else {
 				// draw crosshair when the prompt is left blank
 				this.drawCrosshair();
-			}
-
-			// draw potential stub on highlighted annotation object
-			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled)
-			{
-				annotation.DrawSummary();
 			}
 		}
 		else
@@ -235,9 +252,13 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		foreach (Interaction i in this.highlightedObject.GetComponents<Interaction> ()) 
 		{
-			if (i is Annotation)
-			{
-				i.Interact (this.gameObject);
+			if (i is Annotation) {
+				Annotation a = (Annotation)i;
+
+				// Only allow right click to open full annotation if it is a summary annotation.
+				if (a.annotationType == (int)AnnotationTypes.SUMMARY) {
+					i.Interact (this.gameObject);
+				}
 			}
 		}
 	}
