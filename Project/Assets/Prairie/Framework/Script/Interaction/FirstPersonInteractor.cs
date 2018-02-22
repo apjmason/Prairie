@@ -56,6 +56,7 @@ public class FirstPersonInteractor : MonoBehaviour
 		{
 			// draw overlay UI on highlighted object
 			drawSummaryAnnotation ();
+			drawPrompt ();
 		}
 
 		// process input
@@ -105,14 +106,39 @@ public class FirstPersonInteractor : MonoBehaviour
 		if (this.highlightedObject != null) {
 			// draw potential stub on highlighted annotation object
 			Annotation annotation = this.highlightedObject.GetComponent<Annotation> ();
-			if (annotation != null && this.annotationsEnabled && annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
-				sa.ActivateGui (annotation);
+			if (annotation != null && this.annotationsEnabled && 
+				annotation.annotationType == (int)AnnotationTypes.SUMMARY) {
+				// draw UI if it is inactive or if the content changes
+				if (!sa.isUIActive () || !annotation.summary.Equals(sa.GetCurrentText())) {
+					sa.ActivateGui (annotation);
+				}
 			} else if (sa.isUIActive ()) {
 				sa.DeactivateGui ();
 			}
 		} else {
 			if (sa.isUIActive ()) {
 				sa.DeactivateGui ();
+			}
+		}
+	}
+
+	private void drawPrompt() {
+		PromptGui pg = this.GetComponentInChildren<PromptGui> ();
+
+		if (this.highlightedObject != null) {
+			// draw prompt on highlighted object
+			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
+			if (prompt != null) {
+				// draw UI if it is inactive or if the content changes
+				if (!pg.isUIActive () || !prompt.GetPrompt().Equals(pg.GetCurrentText())) {
+					pg.ActivateGui (prompt);
+				}
+			} else if (pg.isUIActive()) {
+				pg.DeactivateGui ();
+			}
+		} else {
+			if (pg.isUIActive ()) {
+				pg.DeactivateGui ();
 			}
 		}
 	}
@@ -129,12 +155,9 @@ public class FirstPersonInteractor : MonoBehaviour
 
 		if (this.highlightedObject != null)
 		{
-			// draw prompt on highlighted object
 			Prompt prompt = this.highlightedObject.GetComponent<Prompt> ();
-			if (prompt != null && prompt.GetPrompt().Trim() != "")
+			if (prompt == null || prompt.GetPrompt().Trim() == "")
 			{
-				prompt.DrawPrompt();
-			} else {
 				// draw crosshair when the prompt is left blank
 				this.drawCrosshair();
 			}

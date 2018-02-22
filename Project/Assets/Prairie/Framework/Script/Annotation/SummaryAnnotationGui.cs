@@ -12,37 +12,45 @@ public class SummaryAnnotationGui : MonoBehaviour
 
 	public FirstPersonInteractor FPI;
 
-	// Name of the fullAnnotationGUI object in game scene.
+	// Name of the Summary Annotation GUI object in game scene.
 	private const string SUMMARYANNOTATION = "SummaryAnnotationPanel";
+	private GameObject summaryGameObject;
+	private string currentText;
 
 	void Start() {
-		gameObject.transform.Find(SUMMARYANNOTATION).gameObject.SetActive (active);
+		summaryGameObject = gameObject.transform.Find (SUMMARYANNOTATION).gameObject;
+		summaryGameObject.SetActive (active);
+		currentText = "";
 	}
 
 	public void ActivateGui(Annotation a) {
-		GameObject g = gameObject.transform.Find (SUMMARYANNOTATION).gameObject;
-		Text t = g.GetComponentInChildren<Text> ();
+		Text t = summaryGameObject.GetComponentInChildren<Text> ();
 		DisplaySummaryAnnotation(a,t);
 
 		if (!isUIActive ()) {
 			active = true;
-			g.SetActive (active);
+			summaryGameObject.SetActive (active);
 		}
 	}
 
 	public void DeactivateGui() {
 		active = false;
-		gameObject.transform.Find(SUMMARYANNOTATION).gameObject.SetActive (active);
+		summaryGameObject.SetActive (active);
 	}
 
 	public bool isUIActive() {
 		return active;
 	}
 
+	public string GetCurrentText() {
+		return currentText;
+	}
+
 	// Add the newest entry in the in-range area annotations to the UI.
 	// <param name="a">Annotation to display</param>
 	private void DisplaySummaryAnnotation(Annotation a, Text t) {
 		t.text = a.summary;
+		currentText = a.summary;
 		fitFontSizeToParent (t);
 
 		if (a.importType != (int)ImportTypes.NONE)

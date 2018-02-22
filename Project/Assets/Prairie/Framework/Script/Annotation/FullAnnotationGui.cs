@@ -8,6 +8,7 @@ public class FullAnnotationGui : MonoBehaviour
 {
 
 	private bool active = false;
+	private GameObject fullAnnotationGameObject;
 
 	public Transform contentPanel;
 	public GameObject textPrefab;
@@ -18,19 +19,20 @@ public class FullAnnotationGui : MonoBehaviour
 	private const string FULLANNOTATION = "FullAnnotationPanel";
 
 	void Start() {
-		gameObject.transform.Find(FULLANNOTATION).gameObject.SetActive (active);
+		fullAnnotationGameObject = gameObject.transform.Find (FULLANNOTATION).gameObject;
+		fullAnnotationGameObject.SetActive (active);
 	}
 
 	public void ActivateGui(Annotation a) {
 		active = true;
-		gameObject.transform.Find(FULLANNOTATION).gameObject.SetActive (active);
+		fullAnnotationGameObject.SetActive (active);
 		DisplayFullAnnotation(a);
 	}
 
 	public void DeactivateGui() {
 		active = false;
 		RemoveAllContents ();
-		gameObject.transform.Find(FULLANNOTATION).gameObject.SetActive (active);
+		fullAnnotationGameObject.SetActive (active);
 	}
 
 	public bool isUIActive() {
