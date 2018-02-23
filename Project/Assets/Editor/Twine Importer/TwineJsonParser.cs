@@ -62,11 +62,8 @@ public class TwineJsonParser
 
             if (startNodePid.Equals(twineNode.pid))
             {
-                // Enable/activate the start node in the story:
-                twineNodeObject.GetComponent<TwineNode>().enabled = true;
-                // TODO: Come up with a way to actually activate the first node.  Setting "enabled" isn't nearly enough!
-                // TODO: While you're at it, mess with the parser so that it 
-                //   can create multiple twine stories per twine file.  If you feel like it.
+                // Tell the start node that it's a start node
+                twineNodeObject.GetComponent<TwineNode>().isStartNode = true;
             }
         }
 

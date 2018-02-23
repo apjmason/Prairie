@@ -32,6 +32,7 @@ public class TwineNode : MonoBehaviour
     public GameObject[] validChildren;
     public string[] validLinkNames;
     public List<GameObject> parents = new List<GameObject>();
+    public bool isStartNode;
     public bool isDecisionNode;
     public bool isConditionNode;
 
@@ -56,6 +57,23 @@ public class TwineNode : MonoBehaviour
     private static bool fanfold = true;
     public static string storyTitle = "";
 
+    private void Awake()
+    {
+        if (isStartNode)
+        {
+            enabled = true;
+        }
+    }
+
+    private void Start()
+    {
+        if (isStartNode)
+        {
+            FirstPersonInteractor interactor = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
+            GameObject interactorObject = interactor.gameObject;
+            this._Activate(interactorObject);
+        }
+    }
 
     void Update()
     {
@@ -233,33 +251,36 @@ public class TwineNode : MonoBehaviour
     /// <param name="interactor">The interactor.</param>
     public bool Activate(GameObject interactor)
     {
-        //        print(TwineNodeList);
-        print("Activate called on " + name);
         print(this.enabled);
         if (!this.enabled && this.HasActiveParentNode())
         {
-            print("Activating " + name);
-            if (this.isDecisionNode)
-            {
-                FirstPersonInteractor player = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
-                player.setWorldActive("DialogueOpen");
-            }
-            this.enabled = true;
-            this.isMinimized = false;
-            this.RunVariableAssignments();
-            this.UpdateConditionalLinks();
-            //            this.isOptionsGuiOpen = false;
+            this._Activate(interactor);
 
-            this.DeactivateAllParents();
             TwineNodeList.Insert(insertIndex, this);
-            //            TwineNodeList.Add(this);
             visibleNodeIndex = TwineNodeList.IndexOf(this);
-            this.StartInteractions(interactor);
-
             return true;
         }
-
         return false;
+    }
+
+    /// <summary>
+    /// Activate this TwineNode immediately, without any checks beforehand.
+    /// </summary>
+    /// <param name="interactor"></param>
+    private void _Activate(GameObject interactor)
+    {
+        if (this.isDecisionNode)
+        {
+            FirstPersonInteractor player = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
+            player.setWorldActive("DialogueOpen");
+        }
+        this.enabled = true;
+        this.isMinimized = false;
+        this.RunVariableAssignments();
+        this.UpdateConditionalLinks();
+
+        this.DeactivateAllParents();
+        this.StartInteractions(interactor);
     }
 
     /// <summary>
@@ -293,11 +314,6 @@ public class TwineNode : MonoBehaviour
         insertIndex = TwineNodeList.IndexOf(this);
         TwineNodeList.Remove(this);
     }
-
-    //    public void AddToList()
-    //    {
-    //        TwineNodeList.Add(this);
-    //    }
 
     /// <summary>
     /// Check if this Twine Node has an active parent node.  Also only returns "True" if this node is a valid child of the parent.
