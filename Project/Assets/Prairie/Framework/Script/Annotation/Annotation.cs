@@ -39,39 +39,17 @@ public class Annotation : Interaction
     public List<Texture2D> images;
     public string summary = "";
 
+	// The UI element representing an entry in area annotation toolbox
+	public GameObject areaAnnotationUIEntry;
+
 	// Journal option
 	public bool addToJournal = true;
-
-    private bool active = false;
-
-    private GUIStyle fullStyle;
-    private GUIStyle summaryStyle;
-    
-    private Vector2 scrollPosition;
-
-    private Rect rectangle;
-    private readonly float BOX_X = Screen.width / 4;
-    private readonly float BOX_Y = 10;
-    private readonly float BOX_WIDTH = Screen.width / 2;
-    private readonly float BOX_HEIGHT = Screen.height - 20;
 
 	private FirstPersonInteractor player;
 
     void Start()
     {
         content = new AnnotationContent();
-
-        scrollPosition = new Vector2(0, 0);
-
-        rectangle = new Rect(BOX_X, BOX_Y, BOX_WIDTH, BOX_HEIGHT);
-
-        //setting up style for text
-        fullStyle = new GUIStyle();
-        fullStyle.wordWrap = true;
-        fullStyle.richText = true;
-        fullStyle.normal.textColor = Color.white;
-        fullStyle.padding.bottom = 15;
-        fullStyle.padding.top = 15;
 
         images = new List<Texture2D>();
 
@@ -101,7 +79,6 @@ public class Annotation : Interaction
     {
         if (importType != (int)ImportTypes.NONE)
         {
-            active = true;
             FirstPersonInteractor player = this.GetPlayer();
             if (player != null)
             {
@@ -112,132 +89,41 @@ public class Annotation : Interaction
 				if (addToJournal && annotationType == (int)AnnotationTypes.SUMMARY) {
 					player.GetComponentInChildren<Journal> ().AddToJournal (this);
 				}
-            }
-        }
-        
-    }
 
-    void OnGUI()
-    {
-        if (active)
-        {
-            //Allow the player to see and move the cursor (so they can scroll)
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+				// Display full annotation
+				FullAnnotationGui annotationGui = player.GetComponentInChildren<FullAnnotationGui> ();
 
-            //hacky way to increase the opacity of the background
-            //you would think this would be simple
-            //it isn't simple
-            GUI.Box(rectangle, Texture2D.blackTexture);
-            GUI.Box(rectangle, Texture2D.blackTexture);
-            GUI.Box(rectangle, Texture2D.blackTexture);
-
-            GUI.BeginGroup(new Rect(BOX_X + 10, BOX_Y, BOX_WIDTH, BOX_HEIGHT));
-
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(BOX_WIDTH - 10),
-                GUILayout.Height(BOX_HEIGHT));
-
-            DisplayAnnotation();
-
-            GUILayout.EndScrollView();
-            GUI.EndGroup();
-        }
-    }
-
-    /// <summary>
-    /// If summary exists, draw it to the screen
-    /// </summary>
-    public void DrawSummary ()
-    {
-        if (annotationType == (int)AnnotationTypes.SUMMARY && summary != "")
-        {
-            //set up the style so that the summary expands vertically
-            //TODO: figure out why this has to be here, and doesn't work if defined in start
-            summaryStyle = new GUIStyle(GUI.skin.box);
-            summaryStyle.wordWrap = true;
-            summaryStyle.richText = true;
-
-            Rect summaryBox = new Rect(Screen.width / 3, (Screen.height / 2) + (Screen.height / 16), Screen.width / 3, Screen.height / 4);
-            GUILayout.BeginArea(summaryBox);
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            string displayText = summary;
-
-            string clickForMore = "\n\n <size=12><i>Right click for more...</i></size>";
-
-            if (this.importType != (int)ImportTypes.NONE)
-            {
-                displayText += clickForMore;
-            }
-            GUILayout.Box(displayText, summaryStyle,  GUILayout.MaxWidth(Screen.width / 3));
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-        }
-    }
-
-    /// <summary>
-    /// Displays then annotation text and images
-    /// </summary>
-    private void DisplayAnnotation()
-    {
-        for (int i = 0; i < Math.Max(images.Count, content.parsedText.Count); i++)
-        {
-            if (i < content.parsedText.Count && content.parsedText[i] != "")
-            {
-                GUILayout.Label(new GUIContent(content.parsedText[i]), fullStyle, GUILayout.MaxWidth(BOX_WIDTH - 40), GUILayout.ExpandHeight(true));
-            }
-
-            if (i < images.Count)
-            {
-                DisplayImage(images[i]);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Formats and displays a texture
-    /// </summary>
-    /// <param name="tex">Texture to display</param>
-    void DisplayImage(Texture tex)
-    {
-        if (tex != null)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (tex.width > BOX_WIDTH - 40)
-            {
-                //resize image if it is wider than the scrollbox
-                float newHeight = ((BOX_WIDTH - 40) / tex.width) * ((float)tex.height);
-                GUILayout.Label(new GUIContent(tex), GUILayout.Width(BOX_WIDTH - 40), GUILayout.Height(newHeight));
-            }
-            else
-            {
-                GUILayout.Label(new GUIContent(tex));
-            }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-        }
-    }
-
-
-    void Update()
-    {
-        if (active)
-        {
-            if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Escape))
-            {
-                active = false;
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-                
-				FirstPersonInteractor player = this.GetPlayer ();
-				if (player != null) {
-					player.SetCanMove (true);
-					player.SetDrawsGUI (true);
+				if (!annotationGui.isUIActive ()) {
+					annotationGui.ActivateGui (this);
 				}
             }
         }
+    }
+
+    void Update()
+    {
+		FirstPersonInteractor player = this.GetPlayer ();
+		if (player != null) {
+			FullAnnotationGui annotationGui = player.GetComponentInChildren<FullAnnotationGui> ();
+			if (annotationGui.isUIActive()) {
+
+				if (Input.GetKey (KeyCode.Q) || Input.GetKey (KeyCode.Escape)) {
+					annotationGui.DeactivateGui ();
+
+					Cursor.visible = false;
+					Cursor.lockState = CursorLockMode.Locked;
+
+					player.SetCanMove (true);
+					player.SetDrawsGUI (true);
+				} else {
+					Cursor.visible = true;
+					Cursor.lockState = CursorLockMode.None;
+
+					player.SetCanMove (false);
+					player.SetDrawsGUI (false);
+				}
+			}
+		}
     }
 
 	void OnTriggerEnter(Collider other)
@@ -257,6 +143,13 @@ public class Annotation : Interaction
 		else
 		{
 			interactor.areaAnnotationsInRange.Add(this);
+
+			// Draw area annotation entries in the lower left corner
+			AreaAnnotationGui aag = interactor.GetComponentInChildren<AreaAnnotationGui> ();
+			if (!aag.isUIActive ()) {
+				aag.ActivateGui ();
+			}
+			aag.AddAnnotationEntry (this);
 
 			// Add area annotation log to journal
 			if (addToJournal) {
@@ -282,6 +175,13 @@ public class Annotation : Interaction
 		else
 		{
 			interactor.areaAnnotationsInRange.Remove(this);
+
+			// Remove annotation entry from the toolbox on the lower left corner.
+			interactor.GetComponentInChildren<AreaAnnotationGui> ().RemoveAnnotationEntry (this);
+
+			if (interactor.areaAnnotationsInRange.Count == 0) {
+				interactor.GetComponentInChildren<AreaAnnotationGui> ().DeactivateGui ();
+			}
 		}
 	}
 }

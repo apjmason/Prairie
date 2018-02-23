@@ -15,16 +15,13 @@ public class Journal : MonoBehaviour
 
 	public void AddToJournal (Annotation a)
 	{
-		AnnotationContent c = a.content;
-
 		JournalEntry e = ScriptableObject.CreateInstance<JournalEntry> ();
 		e.title = a.summary;
-		e.content = c.parsedText;
-		e.imagePaths = c.imagePaths;
+		e.content = a.content;
+		e.images = a.images;
 
 		if (!journal.Contains (e)) {
 			journal.Add (e);
-			Debug.Log ("Add " + e.title + "'s annotation info to journal.");
 		}
 	}
 }
