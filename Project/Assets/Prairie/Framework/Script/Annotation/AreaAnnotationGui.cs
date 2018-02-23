@@ -39,7 +39,6 @@ public class AreaAnnotationGui : MonoBehaviour
 		List<Annotation> annotations = FPI.areaAnnotationsInRange;
 		GameObject newStoryEntry;
 
-		Debug.Log ("Add annotation " + a.summary);
 		// Instantiate a new prefab if not enough entries have been created before.
 		newStoryEntry = (GameObject)GameObject.Instantiate (prefab);
 		newStoryEntry.transform.SetParent (contentPanel);
@@ -59,7 +58,6 @@ public class AreaAnnotationGui : MonoBehaviour
 
 	// Remove the last entry when out of range.
 	public void RemoveAnnotationEntry(Annotation removed) {
-		Debug.Log ("Remove annotation " + removed.summary);
 		// Destory the UI prefab associated with the removed annotation.
 		Destroy(removed.areaAnnotationUIEntry);
 

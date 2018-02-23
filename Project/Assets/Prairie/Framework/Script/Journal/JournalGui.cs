@@ -1,15 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class JournalGui : MonoBehaviour {
 	private bool active = false;
 	private bool isJournalOpen = false;
 	private int startingEntry = 0;
 
-	public Transform contentPanel;
-	public GameObject prefab;
+	public Transform contentEntryPanel;
+	public GameObject entryPrefab;
 	public FirstPersonInteractor FPI;
 
 	// Name of the journal UI object in game scene.
@@ -17,9 +17,13 @@ public class JournalGui : MonoBehaviour {
 	// Name of the entry panel UI object in game scene.
 	private const string ENTRYPANEL = "EntryPanel";
 
+	GameObject journalGameObject;
+	GameObject entryPanelGameObject;
+	GameObject infoPanelGameObject;
 
 	void Start() {
-		gameObject.transform.Find(JOURNAL).gameObject.SetActive (active);
+		journalGameObject = gameObject.transform.Find (JOURNAL).gameObject;
+		journalGameObject.SetActive (active);
 	}
 
 	// Update is called once per frame
@@ -39,11 +43,11 @@ public class JournalGui : MonoBehaviour {
 
 	public void openJournal(){
 		AddButtons ();
-		gameObject.transform.Find(JOURNAL).gameObject.SetActive (true);
+		journalGameObject.SetActive (true);
 	}
 
 	public void closeJournal(){
-		gameObject.transform.Find(JOURNAL).gameObject.SetActive (false);
+		journalGameObject.SetActive (false);
 	}
 
 	public bool isOpen() {
@@ -56,12 +60,12 @@ public class JournalGui : MonoBehaviour {
 		for (int i = startingEntry; i < entries.Count; i++) 
 		{
 			JournalEntry e = entries[i];
-			GameObject newButton = (GameObject)GameObject.Instantiate(prefab);
+			GameObject newButton = (GameObject)GameObject.Instantiate(entryPrefab);
 
-			newButton.transform.SetParent(contentPanel);
+			newButton.transform.SetParent(contentEntryPanel);
 
 			// Scale the button.
-			fitPrefabToParentSize(newButton);
+			fitPrefabToEntryPanelSize(newButton);
 
 			JournalTitleGuiButton jtgb = newButton.GetComponent<JournalTitleGuiButton>();
 			jtgb.Setup(e);
@@ -70,8 +74,8 @@ public class JournalGui : MonoBehaviour {
 		}
 	}
 
-	private void fitPrefabToParentSize(GameObject button) {
-		double actualWidth = gameObject.transform.Find(JOURNAL).gameObject.transform.Find(ENTRYPANEL).GetComponent<RectTransform> ().rect.width; // This is the actual width we want to prefab to be after scaling.
+	private void fitPrefabToEntryPanelSize(GameObject button) {
+		double actualWidth = journalGameObject.transform.Find(ENTRYPANEL).GetComponent<RectTransform> ().rect.width; // This is the actual width we want to prefab to be after scaling.
 		float originalWidth = button.GetComponent<LayoutElement>().preferredWidth; // This is the preset preferred width of the prefab.
 
 		// Constrain the prefab width to its parent panel.
