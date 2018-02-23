@@ -402,21 +402,59 @@ public class TwineNode : MonoBehaviour
                     // Operation of the condition - e.g. "=", "!="
                     string operation = conditionalOp[condIndex];
                     // Truth value of the conditional
-                    bool conditionMet;
-                    if (operation == "=") 
+                    bool conditionMet = false;
+                    switch (operation)
                     {
-                        conditionMet = globalVariables.GetValue(varName) == conditionalVals[condIndex];
+                        // For equals and not equals, we compare the values
+                        // without caring if they can be converted to ints.
+                        case "=":
+                            conditionMet = globalVariables.GetValue(varName) == conditionalVals[condIndex];
+                            break;
+                        case "!=":
+                            conditionMet = !(globalVariables.GetValue(varName) == conditionalVals[condIndex]);
+                            break;
+                        default:
+                            // For greater-than/less-than-style comparisons, we
+                            // break and leave conditionMet as false unless both
+                            // values can be converted to ints.
+                            int val1;
+                            if (!Int32.TryParse(globalVariables.GetValue(varName), out val1)) break;
+                            int val2;
+                            if (!Int32.TryParse(conditionalVals[condIndex], out val2)) break;
+                            switch (operation)
+                            {
+                                case "<":
+                                    if (val1 < val2)
+                                    {
+                                        conditionMet = true;
+                                    }
+                                    break;
+                                case "<=":
+                                    if (val1 <= val2)
+                                    {
+                                        conditionMet = true;
+                                    }
+                                    break;
+                                case ">":
+                                    if (val1 > val2)
+                                    {
+                                        conditionMet = true;
+                                    }
+                                    break;
+                                case ">=":
+                                    if (val1 >= val2)
+                                    {
+                                        conditionMet = true;
+                                    }
+                                    break;
+                                default:
+                                    conditionMet = false;
+                                    Exception e = new Exception("Twine conditional has unknown operation");
+                                    throw e;
+                            }
+                            break;
                     }
-                    else if (operation == "!=")
-                    {
-                        conditionMet = !(globalVariables.GetValue(varName) == conditionalVals[condIndex]);
-                    }
-                    else
-                    {
-                        conditionMet = false;
-                        Exception e = new Exception("Twine conditional has unknown operation");
-                        throw e;
-                    }
+                    
                     //Debug.Log("Operation is " + operation);
                     //Debug.Log(globalVariables.GetValue(varName));
                     //Debug.Log(conditionalVals[condIndex]);

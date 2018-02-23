@@ -179,7 +179,7 @@ public class TwineJsonParser
         // E.g.
         //   "= red" and "=", "red"
         //   "!= 3" and "!=", "3"
-        Regex matchValueRegex = new Regex("(!?=)\\s*(-?\\w*)");
+        Regex matchValueRegex = new Regex("(!?=|<=?|>=?)\\s*(-?\\w*)");
 
         // Finds a twine link - i.e. a double-bracketed line of text - with the
         // link content in a sub-group
