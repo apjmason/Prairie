@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public class JournalEntry : ScriptableObject
 {
 	public string title;
-	public List<string> content;
-	public List<string> imagePaths;
+	public AnnotationContent content;
+	public List<Texture2D> images;
 
 	public override bool Equals(System.Object obj)
 	{
