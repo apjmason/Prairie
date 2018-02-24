@@ -59,6 +59,9 @@ public class TwineNode : MonoBehaviour
     private static bool fanfold = true;
     public static string storyTitle = "";
     private static bool allMinimized = false;
+    private float vScrollBarValue;
+    public Vector2 scrollPosition = new Vector2(0, 0);
+    private string innerText;
 
     private void Awake()
     {
@@ -133,9 +136,6 @@ public class TwineNode : MonoBehaviour
             }
         }
     
-        private float vScrollBarValue;
-        public Vector2 scrollPosition = new Vector2(0, 0);
-        private string innerText;
         public void OnGUI()
         {
             if ((fanfold) && (allMinimized == false)) {
