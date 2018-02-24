@@ -28,7 +28,6 @@ public class TwineNode : MonoBehaviour
     public string show = "";
     public GameObject[] children;
     [HideInInspector]
-    public string[] childrenNames;
     public string[] linkNames;
     public GameObject[] validChildren;
     public string[] validLinkNames;
@@ -59,9 +58,9 @@ public class TwineNode : MonoBehaviour
 
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
     public static int visibleNodeIndex = 0;
+    private static bool allMinimized = false;
     private static bool fanfold = true;
     public static string storyTitle = "";
-    private static bool allMinimized = false;
 
     private void Awake()
     {
@@ -79,7 +78,7 @@ public class TwineNode : MonoBehaviour
             GameObject interactorObject = interactor.gameObject;
             this._Activate(interactorObject);
         }
-            StartCoroutine(Example());
+        StartCoroutine(Example());
     }
 
     /// <summary>
@@ -94,52 +93,94 @@ public class TwineNode : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Check if TwineNode has no children. If it
-    ///     doesn't, wait 5 seconds and deactivate.
-    /// </summary>
-    void Update ()
+    void Update()
     {
-            UpdateConditionalLinks();
-            if (this.enabled) {
-                if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0 && allMinimized == false){
-                    fanfold = !fanfold;
+        UpdateConditionalLinks();
+        if (this.enabled)
+        {
+            if (Input.GetKeyDown(KeyCode.C) && TwineNodeList.IndexOf(this) == 0  && allMinimized == false)
+            {
+                fanfold = !fanfold;
+            }
+            if (Input.GetKeyDown (KeyCode.M) && TwineNodeList.IndexOf(this) == 0){
+                allMinimized = !allMinimized;
+            }
+            if (!TwineNodeList.Contains(this))
+            {
+                TwineNodeList.Add(this);
+            }
+            if (Input.GetKeyDown(KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0 && allMinimized == false && fanfold == false)
+            {
+                if (visibleNodeIndex == TwineNodeList.Count - 1)
+                {
+                    visibleNodeIndex = 0;
                 }
-                if (Input.GetKeyDown (KeyCode.M) && TwineNodeList.IndexOf(this) == 0){
-                    allMinimized = !allMinimized;
-                }
-                if (!TwineNodeList.Contains(this)){
-                    TwineNodeList.Add(this);
-                }
-                if (Input.GetKeyDown (KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0 && allMinimized == false && fanfold == false){
-                    if (visibleNodeIndex == TwineNodeList.Count - 1) {
-                        visibleNodeIndex = 0;
-                    }
-                    else {
-                        visibleNodeIndex++;
-                    }
-                }
-                if (TwineNodeList.IndexOf(this) == visibleNodeIndex) {
-                    this.isMinimized = false;
-                }
-                else {
-                    this.isMinimized = true;
-                }
-                if (this.isDecisionNode) {
-                    this.isOptionsGuiOpen = true;
-                } else if (this.isConditionNode) {
-                    // get the $color value from global list
-                    // check the platform name by check $color:platform pair stored in condition node
-                    // check child node name to match platform name
-                    // activate childnode
-                    this.ActivateChildAtIndex (0);
+                else
+                {
+                    visibleNodeIndex++;
                 }
             }
+            if (TwineNodeList.IndexOf(this) == visibleNodeIndex)
+            {
+                this.isMinimized = false;
+            }
+            else
+            {
+                this.isMinimized = true;
+            }
+            //            if (Input.GetKeyDown (KeyCode.Alpha0)) {
+            //				visibleNodeIndex = 0;
+            //			}
+            //            if (Input.GetKeyDown (KeyCode.Alpha1)) {
+            //				visibleNodeIndex = 1;
+            //			}
+            //			if (Input.GetKeyDown (KeyCode.Q) {
+            //				this.isMinimized = ;
+            //			}
+
+            if (this.isDecisionNode)
+            {
+                this.isOptionsGuiOpen = true;
+            }
+            if (this.isConditionNode)
+            {
+                // get the $color value from global list
+                // check the platform name by check $color:platform pair stored in condition node
+                // check child node name to match platform name
+                // activate childnode
+                this.ActivateChildAtIndex(0);
+            }
         }
-    
-        public void OnGUI()
+    }
+
+    public void OnGUI()
+    {
+        if (isDecisionNode)
         {
-            if ((fanfold) && (allMinimized == false)) {
+            int frameWidth = Math.Min(Screen.width / 3, 500);
+            int frameHeight = Math.Min(Screen.height / 2, 350);
+            int horizontalAlign = (Screen.width - frameWidth) / 2;
+            int verticalAlign = Screen.height - frameHeight;
+
+            Rect frame = new Rect(horizontalAlign, verticalAlign, frameWidth, frameHeight);
+
+            GUI.BeginGroup(frame);
+            GUIStyle style = new GUIStyle(GUI.skin.box);
+            style.normal.textColor = Color.white;
+            style.wordWrap = true;
+            style.fixedWidth = frameWidth;
+            GUILayout.Box(this.content, style);
+            for (int index = 0; index < this.validLinkNames.Length; index++)
+            {
+                if (GUILayout.Button(this.validLinkNames[index]))
+                {
+                    this.ActivateChildAtIndex(index);
+                }
+            }
+
+            GUI.EndGroup();
+        }
+        else if ((fanfold) && (allMinimized == false)) {
                 float frameWidth = Math.Min(Screen.width / 5, 200);
                 float frameHeight = 80;
                 if (TwineNodeList.Count() > 0){
@@ -154,31 +195,6 @@ public class TwineNode : MonoBehaviour
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(frameWidth + 10), GUILayout.Height(frameHeight));
                 content = content.TrimEnd();
                 GUILayout.Label(new GUIContent(this.content), style, GUILayout.Width(frameWidth - 20), GUILayout.ExpandHeight(true));
-                
-                if (isDecisionNode) {
-                    GUIStyle decisionHintStyle = new GUIStyle (style);
-                    decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
-
-                    if (!isOptionsGuiOpen) {
-                        GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
-                    } else {
-                        GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
-                    }
-                }
-
-                if (this.isOptionsGuiOpen) {
-                    // Draw list of buttons for the possible children nodes to visit:
-                    GUIStyle optionButtonStyle = new GUIStyle (GUI.skin.button);
-                    optionButtonStyle.fontStyle = FontStyle.Italic;
-                    optionButtonStyle.wordWrap = true;
-
-                    // Set highlighted button to have white text (this state is called `onNormal`):
-                    optionButtonStyle.onNormal.textColor = Color.white;
-                    // Set non-highlighted buttons to have grayed out text (state is called `normal`)
-                    optionButtonStyle.normal.textColor = Color.gray;
-
-                    selectedOptionIndex = GUILayout.SelectionGrid(selectedOptionIndex, this.childrenNames, 1, optionButtonStyle);
-                }
                 GUILayout.EndScrollView();
                 GUI.EndGroup ();
 
@@ -192,32 +208,6 @@ public class TwineNode : MonoBehaviour
                 style.wordWrap = true;
                 style.fixedWidth = frameWidth;
                 GUILayout.Box (this.content, style);
-
-                if (isDecisionNode) {
-                    GUIStyle decisionHintStyle = new GUIStyle (style);
-                    decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
-
-                    if (!isOptionsGuiOpen) {
-                        GUILayout.Box ("Press TAB to progress in the story...", decisionHintStyle);
-                    } else {
-                        GUILayout.Box ("Press TAB to scroll, E to close, ENTER to choose", decisionHintStyle);
-                    }
-                }
-
-                if (this.isOptionsGuiOpen) {
-                    // Draw list of buttons for the possible children nodes to visit:
-                    GUIStyle optionButtonStyle = new GUIStyle (GUI.skin.button);
-                    optionButtonStyle.fontStyle = FontStyle.Italic;
-                    optionButtonStyle.wordWrap = true;
-
-                    // Set highlighted button to have green text (this state is called `onNormal`):
-                    optionButtonStyle.onNormal.textColor = Color.white;
-                    // Set non-highlighted buttons to have grayed out text (state is called `normal`)
-                    optionButtonStyle.normal.textColor = Color.gray;
-
-                    selectedOptionIndex = GUILayout.SelectionGrid(selectedOptionIndex, this.childrenNames, 1, optionButtonStyle);
-                }
-
                 GUI.EndGroup ();
 
             } else if (this.enabled && this.isMinimized) {
