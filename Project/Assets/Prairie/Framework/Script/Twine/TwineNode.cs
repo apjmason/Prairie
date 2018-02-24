@@ -402,6 +402,7 @@ public class TwineNode : MonoBehaviour
     public List<GameObject> parents = new List<GameObject>();
     public bool isDecisionNode;
     public bool isConditionNode;
+    public bool isStartNode;
 
     public List<string> assignmentVars;
     public List<string> assignmentVals;
@@ -420,15 +421,27 @@ public class TwineNode : MonoBehaviour
 
     public static List<TwineNode> TwineNodeList = new List<TwineNode>();
     public static int visibleNodeIndex = 0;
-    public static int insertIndex = -1;
+    public int insertIndex = -1;
     private static bool fanfold = true;
     public static string storyTitle = "";
     public static bool allMinimized = false;
     public string[] childrenNames;
 
-
-    void Start()
+    private void Awake()
         {
+            if (isStartNode)
+            {
+                enabled = true;
+            }
+        }
+    private void Start()
+        {
+            if (isStartNode)
+                {
+                    FirstPersonInteractor interactor = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
+                    GameObject interactorObject = interactor.gameObject;
+                    this.Activate(interactorObject);
+                }
             StartCoroutine(Example());
         }
 
@@ -442,6 +455,7 @@ public class TwineNode : MonoBehaviour
 
         void Update ()
         {
+            UpdateConditionalLinks();
             if (this.enabled) {
                 if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0){
                     fanfold = !fanfold;
@@ -647,11 +661,12 @@ public class TwineNode : MonoBehaviour
     public bool Activate(GameObject interactor)
     {
         //        print(TwineNodeList);
-        print("Activate called on " + name);
-        print(this.enabled);
+//        print("Activate called on " + name);
+//        print(this.enabled);
+//        print(this.HasActiveParentNode());
         if (!this.enabled && this.HasActiveParentNode())
         {
-            print("Activating " + name);
+//            print("Activating " + name);
             if (this.isDecisionNode)
             {
                 FirstPersonInteractor player = (FirstPersonInteractor)FindObjectOfType(typeof(FirstPersonInteractor));
@@ -662,7 +677,10 @@ public class TwineNode : MonoBehaviour
             this.RunVariableAssignments();
             this.UpdateConditionalLinks();
             //            this.isOptionsGuiOpen = false;
-
+            foreach (GameObject parent in parents){
+                insertIndex = TwineNodeList.IndexOf(parent.GetComponent<TwineNode>());
+                print(insertIndex);
+            }
             this.DeactivateAllParents();
             TwineNodeList.Insert(insertIndex, this);
             //            TwineNodeList.Add(this);
@@ -703,7 +721,7 @@ public class TwineNode : MonoBehaviour
             player.setWorldActive("DialogueClose");
         }
         this.enabled = false;
-        insertIndex = TwineNodeList.IndexOf(this);
+//        insertIndex = TwineNodeList.IndexOf(this);
         TwineNodeList.Remove(this);
     }
 
