@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
+// Interface for Various types of interactions, eg: Annotation, PromptInteraction, etc.
 public abstract class Interaction : MonoBehaviour
 {
 	public bool repeatable = true;

@@ -26,6 +26,9 @@ public class AnnotationInteractionEditor : Editor {
             annotation.annotationType = _annotationType;
         }
 
+		// journal
+		annotation.addToJournal = EditorGUILayout.Toggle("Add to Journal: ", annotation.addToJournal);
+
         // warnings
         if (annotation.annotationType == (int)AnnotationTypes.AREA)
         {
