@@ -27,9 +27,12 @@ public class PromptEditor : Editor {
 
     public void SimplePromptGUI(bool cyclicAllowed = true)
     {
-        GUIContent label = new GUIContent ("Prompt Text", "Text displayed when a player can interact with this object.");
+		GUIContent label = new GUIContent ("Prompt Text (Max 30 chararcters)", "Text displayed when a player can interact with this object.");
         EditorGUI.BeginChangeCheck();
-        string _firstPrompt = EditorGUILayout.TextField (label, prompt.firstPrompt);
+		GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
+		GUILayout.Label (label);
+		string _firstPrompt = GUILayout.TextArea(prompt.firstPrompt, 30, textAreaStyle, GUILayout.Height(18),
+			GUILayout.Width(EditorGUIUtility.currentViewWidth - 50), GUILayout.ExpandWidth(false));
         if (EditorGUI.EndChangeCheck())
         {
             // first prompt was edited
@@ -57,8 +60,10 @@ public class PromptEditor : Editor {
         if (prompt.isCyclic)
         {
             GUIContent secondLabel = new GUIContent("Second Prompt", "Second prompt to display, will toggle between this and first prompt.");
-            EditorGUI.BeginChangeCheck();
-            string _secondPrompt = EditorGUILayout.TextField(secondLabel, prompt.secondPrompt);
+			GUILayout.Label (secondLabel);
+			EditorGUI.BeginChangeCheck();
+			string _secondPrompt = GUILayout.TextArea(prompt.secondPrompt, 30, textAreaStyle, GUILayout.Height(18),
+				GUILayout.Width(EditorGUIUtility.currentViewWidth - 50), GUILayout.ExpandWidth(false));
             if (EditorGUI.EndChangeCheck())
             {
                 // second prompt was edited
