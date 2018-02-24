@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
-//using TwineVariables;
 using System;
 using System.Linq;
 
@@ -52,16 +51,17 @@ public class TwineNode : MonoBehaviour
     private bool isOptionsGuiOpen = false;
 
     private int selectedOptionIndex = 0;
-
-    public static List<TwineNode> TwineNodeList = new List<TwineNode>();
-    public static int visibleNodeIndex = 0;
+    
     public int insertIndex = -1;
-    private static bool fanfold = true;
-    public static string storyTitle = "";
-    private static bool allMinimized = false;
     private float vScrollBarValue;
     public Vector2 scrollPosition = new Vector2(0, 0);
     private string innerText;
+
+    public static List<TwineNode> TwineNodeList = new List<TwineNode>();
+    public static int visibleNodeIndex = 0;
+    private static bool fanfold = true;
+    public static string storyTitle = "";
+    private static bool allMinimized = false;
 
     private void Awake()
     {
@@ -82,6 +82,10 @@ public class TwineNode : MonoBehaviour
             StartCoroutine(Example());
     }
 
+    /// <summary>
+    /// Check if TwineNode has no children. If it
+    ///     doesn't, wait 5 seconds and deactivate.
+    /// </summary>
     IEnumerator Example()
     {
         if (this.children.Length == 0) {
@@ -89,13 +93,13 @@ public class TwineNode : MonoBehaviour
             this.Deactivate();
         }
     }
-
+    
+    /// <summary>
+    /// Check if TwineNode has no children. If it
+    ///     doesn't, wait 5 seconds and deactivate.
+    /// </summary>
     void Update ()
     {
-//        foreach (TwineNode node in TwineNodeList){
-//            print(node.name + " " + TwineNodeList.IndexOf(node));
-//            print(visibleNodeIndex);
-//        }
             UpdateConditionalLinks();
             if (this.enabled) {
                 if (Input.GetKeyDown (KeyCode.C) && TwineNodeList.IndexOf(this) == 0 && allMinimized == false){
@@ -109,11 +113,9 @@ public class TwineNode : MonoBehaviour
                 }
                 if (Input.GetKeyDown (KeyCode.Tab) && TwineNodeList.IndexOf(this) == 0 && allMinimized == false && fanfold == false){
                     if (visibleNodeIndex == TwineNodeList.Count - 1) {
-                        print("1");
                         visibleNodeIndex = 0;
                     }
                     else {
-                        print("2");
                         visibleNodeIndex++;
                     }
                 }
@@ -131,7 +133,6 @@ public class TwineNode : MonoBehaviour
                     // check child node name to match platform name
                     // activate childnode
                     this.ActivateChildAtIndex (0);
-                    Debug.Log ("This is a Condition Node: " + this.name);
                 }
             }
         }
@@ -145,17 +146,15 @@ public class TwineNode : MonoBehaviour
                     frameHeight = Math.Min(Screen.height / (TwineNodeList.Count()), 80);
                 }
                 int index = TwineNodeList.IndexOf(this);
-                Rect frame = new Rect (10, 10+index*100, frameWidth, frameHeight);
-
+                Rect frame = new Rect (10, 10+index*80, frameWidth, frameHeight);
                 GUIStyle style = new GUIStyle (GUI.skin.box);
                 style.wordWrap = true;
-                style.fixedWidth = frameWidth;
-
+                style.fixedWidth = frameWidth-10;
                 GUI.BeginGroup(new Rect(20, 10+index*frameHeight, frameWidth + 10, frameHeight));
-
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(frameWidth + 10), GUILayout.Height(frameHeight));
                 content = content.TrimEnd();
-                GUILayout.Label(new GUIContent(this.content), style, GUILayout.Width(frameWidth - 50), GUILayout.ExpandHeight(true));
+                GUILayout.Label(new GUIContent(this.content), style, GUILayout.Width(frameWidth - 20), GUILayout.ExpandHeight(true));
+                
                 if (isDecisionNode) {
                     GUIStyle decisionHintStyle = new GUIStyle (style);
                     decisionHintStyle.fontStyle = FontStyle.BoldAndItalic;
@@ -173,7 +172,7 @@ public class TwineNode : MonoBehaviour
                     optionButtonStyle.fontStyle = FontStyle.Italic;
                     optionButtonStyle.wordWrap = true;
 
-                    // Set highlighted button to have green text (this state is called `onNormal`):
+                    // Set highlighted button to have white text (this state is called `onNormal`):
                     optionButtonStyle.onNormal.textColor = Color.white;
                     // Set non-highlighted buttons to have grayed out text (state is called `normal`)
                     optionButtonStyle.normal.textColor = Color.gray;
@@ -266,7 +265,6 @@ public class TwineNode : MonoBehaviour
     /// <param name="interactor">The interactor.</param>
     public bool Activate(GameObject interactor)
     {
-        print(this.enabled);
         if (!this.enabled && this.HasActiveParentNode())
         {
             this._Activate(interactor);
@@ -363,12 +361,10 @@ public class TwineNode : MonoBehaviour
     /// </summary>
     private void DeactivateAllParents()
     {
-        print("Deactivating parents of " + name);
         foreach (GameObject parent in parents)
         {
             if(parent.GetComponent<TwineNode>().enabled)
             {
-                print("Deactivating " + parent.GetComponent<TwineNode>().name);
                 parent.GetComponent<TwineNode>().Deactivate();
             }
         }
@@ -489,10 +485,6 @@ public class TwineNode : MonoBehaviour
                             }
                             break;
                     }
-                    
-                    //Debug.Log("Operation is " + operation);
-                    //Debug.Log(globalVariables.GetValue(varName));
-                    //Debug.Log(conditionalVals[condIndex]);
                     if (conditionMet)
                     {
                         checkedChildNames.Add(linkNames[index]);
@@ -522,7 +514,6 @@ public class TwineNode : MonoBehaviour
 
     public void AddConditional(string var, string value, string link, string match)
     {
-        Debug.Log("Add conditional");
         if (conditionalVars == null)
         {
             conditionalVars = new List<string>();
