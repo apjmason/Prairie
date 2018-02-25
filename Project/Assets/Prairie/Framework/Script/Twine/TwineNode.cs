@@ -92,7 +92,7 @@ public class TwineNode : MonoBehaviour
             this.Deactivate();
         }
     }
-    
+
     void Update()
     {
         UpdateConditionalLinks();
@@ -128,16 +128,6 @@ public class TwineNode : MonoBehaviour
             {
                 this.isMinimized = true;
             }
-            //            if (Input.GetKeyDown (KeyCode.Alpha0)) {
-            //				visibleNodeIndex = 0;
-            //			}
-            //            if (Input.GetKeyDown (KeyCode.Alpha1)) {
-            //				visibleNodeIndex = 1;
-            //			}
-            //			if (Input.GetKeyDown (KeyCode.Q) {
-            //				this.isMinimized = ;
-            //			}
-
             if (this.isDecisionNode)
             {
                 this.isOptionsGuiOpen = true;
@@ -257,6 +247,15 @@ public class TwineNode : MonoBehaviour
     {
         if (!this.enabled && this.HasActiveParentNode())
         {
+            foreach (GameObject parent in parents)
+            {
+                if (parent.GetComponent<TwineNode>().enabled)
+                {
+                    insertIndex = TwineNodeList.IndexOf(parent.GetComponent<TwineNode>());
+                }
+            }
+            TwineNodeList.Insert(insertIndex, this);
+            visibleNodeIndex = TwineNodeList.IndexOf(this);
             this._Activate(interactor);
             return true;
         }
@@ -278,16 +277,7 @@ public class TwineNode : MonoBehaviour
         this.isMinimized = false;
         this.RunVariableAssignments();
         this.UpdateConditionalLinks();
-        foreach (GameObject parent in parents)
-        {
-            if (parent.GetComponent<TwineNode>().enabled)
-            {
-                insertIndex = TwineNodeList.IndexOf(parent.GetComponent<TwineNode>());
-            }
-        }
         this.DeactivateAllParents();
-        TwineNodeList.Insert(insertIndex, this);
-        visibleNodeIndex = TwineNodeList.IndexOf(this);
         this.StartInteractions(interactor);
     }
 
