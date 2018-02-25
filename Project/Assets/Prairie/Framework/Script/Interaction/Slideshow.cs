@@ -73,12 +73,14 @@ public class Slideshow : PromptInteraction
 		}
 	}
 
+	//Not sure what calls this, but this draws a line from a place away from object to the object I think 
 	void onDrawGizmos()
 	{
 		Gizmos.color = Color.green;
 		Gizmos.DrawRay (transform.position * 3, transform.position);
 	}
 
+	//goes through slideshow based on key input
 	void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
